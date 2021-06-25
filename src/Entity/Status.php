@@ -30,14 +30,10 @@ class Status
     private $studio;
 
     /**
-     * @ORM\ManyToOne(targetEntity=video::class, inversedBy="status")
+     * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="status")
      */
     private $video;
 
-    public function __construct()
-    {
-        $this->video = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -69,15 +65,16 @@ class Status
         return $this;
     }
 
-    public function getVideo(): ArrayCollection
+    public function getVideo(): ?Video
     {
         return $this->video;
     }
 
-    public function setVideo(?video $video): self
+    public function setVideo(?Video $video): self
     {
         $this->video = $video;
 
         return $this;
     }
+
 }

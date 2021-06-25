@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<article>
+{{ form_start(video) }}
+
+    {{ form_label(video.title, 'titre de la video') }}
+    {{ form_widget(video.title) }}
+    {{ form_label(video.description) }}
+    {{ form_widget(video.description) }}
+    {{ form_label(video.difficulty, 'entrez la difficulté') }}
+    {{ form_widget(video.difficulty) }}
+    {{ form_label(video.media) }}
+    {{ form_widget(video.media) }}
+    <button type="submit">Envoyer</button>
+
+{{ form_end(video) }}
+</article>
+{% endblock %}

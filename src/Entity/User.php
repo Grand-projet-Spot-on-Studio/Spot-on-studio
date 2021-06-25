@@ -54,6 +54,11 @@ class User
      */
     private $studio;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="user")
+     */
+    private $video;
+
     public function __construct()
     {
         $this->studio = new ArrayCollection();
@@ -162,6 +167,18 @@ class User
                 $studio->setUserEmployed(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getVideo(): ?Video
+    {
+        return $this->video;
+    }
+
+    public function setVideo(?Video $video): self
+    {
+        $this->video = $video;
 
         return $this;
     }
