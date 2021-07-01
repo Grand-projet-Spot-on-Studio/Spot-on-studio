@@ -66,14 +66,14 @@ class Video
 
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="video")
-     */
-    private $user;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Status::class, mappedBy="video")
+     * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="video")
      */
     private $status;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="video")
+     */
+    private $user;
 
     /**
      * @ORM\OneToMany(targetEntity=Media::class, mappedBy="video")
@@ -82,10 +82,9 @@ class Video
 
     public function __construct()
     {
-        $this->user = new ArrayCollection();
-        $this->status = new ArrayCollection();
         $this->media = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -200,62 +199,27 @@ class Video
         return $this;
     }
 
-    /**
-     * @return Collection|User[]
-     */
-    public function getUser(): Collection
-    {
-        return $this->user;
-    }
 
-    public function addUser(User $user): self
-    {
-        if (!$this->user->contains($user)) {
-            $this->user[] = $user;
-            $user->setVideo($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): self
-    {
-        if ($this->user->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getVideo() === $this) {
-                $user->setVideo(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Status[]
-     */
-    public function getStatus(): Collection
+    public function getStatus(): ?Status
     {
         return $this->status;
     }
 
-    public function addStatus(Status $status): self
+    public function setStatus(?Status $status): self
     {
-        if (!$this->status->contains($status)) {
-            $this->status[] = $status;
-            $status->setVideo($this);
-        }
+        $this->status = $status;
 
         return $this;
     }
 
-    public function removeStatus(Status $status): self
+    public function getUser(): ?User
     {
-        if ($this->status->removeElement($status)) {
-            // set the owning side to null (unless already changed)
-            if ($status->getVideo() === $this) {
-                $status->setVideo(null);
-            }
-        }
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
@@ -268,25 +232,28 @@ class Video
         return $this->media;
     }
 
-    public function addMedia(Media $medium): self
+    public function addMedia(Media $media): self
     {
-        if (!$this->media->contains($medium)) {
-            $this->media[] = $medium;
-            $medium->setVideo($this);
+        if (!$this->media->contains($media)) {
+            $this->media[] = $media;
+            $media->setVideo($this);
         }
 
         return $this;
     }
 
-    public function removeMedia(Media $medium): self
+    public function removeMedia(Media $media): self
     {
-        if ($this->media->removeElement($medium)) {
+        if ($this->media->removeElement($media)) {
             // set the owning side to null (unless already changed)
-            if ($medium->getVideo() === $this) {
-                $medium->setVideo(null);
+            if ($media->getVideo() === $this) {
+                $media->setVideo(null);
             }
         }
 
         return $this;
     }
+
+
+
 }

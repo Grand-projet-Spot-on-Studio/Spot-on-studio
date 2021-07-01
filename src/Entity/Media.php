@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MediaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,6 +33,12 @@ class Media
      * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="media")
      */
     private $video;
+
+
+    public function __construct()
+    {
+        $this->video = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -72,6 +80,13 @@ class Media
 
         return $this;
     }
+
+
+
+
+
+
+
 
 
 

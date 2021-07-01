@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\StatusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -30,10 +31,14 @@ class Status
     private $studio;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="status")
+     * @ORM\OneToMany(targetEntity=Video::class, mappedBy="status")
      */
     private $video;
 
+    public function __construct()
+    {
+        $this->video = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -65,16 +70,36 @@ class Status
         return $this;
     }
 
-    public function getVideo(): ?Video
+    /**
+     * @return Collection|Video[]
+     */
+    public function getVideo(): Collection
     {
         return $this->video;
     }
 
-    public function setVideo(?Video $video): self
+    public function addVideo(Video $video): self
     {
-        $this->video = $video;
+        if (!$this->video->contains($video)) {
+            $this->video[] = $video;
+            $video->setStatus($this);
+        }
 
         return $this;
     }
+
+    public function removeVideo(Video $video): self
+    {
+        if ($this->video->removeElement($video)) {
+            // set the owning side to null (unless already changed)
+            if ($video->getStatus() === $this) {
+                $video->setStatus(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 
 }

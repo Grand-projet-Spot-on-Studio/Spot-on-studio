@@ -55,13 +55,17 @@ class User
     private $studio;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="user")
+     * @ORM\OneToMany(targetEntity=Video::class, mappedBy="user")
      */
     private $video;
+
+
 
     public function __construct()
     {
         $this->studio = new ArrayCollection();
+        $this->video = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -171,15 +175,37 @@ class User
         return $this;
     }
 
-    public function getVideo(): ?Video
+    /**
+     * @return Collection|Video[]
+     */
+    public function getVideo(): Collection
     {
         return $this->video;
     }
 
-    public function setVideo(?Video $video): self
+    public function addVideo(Video $video): self
     {
-        $this->video = $video;
+        if (!$this->video->contains($video)) {
+            $this->video[] = $video;
+            $video->setUser($this);
+        }
 
         return $this;
     }
+
+    public function removeVideo(Video $video): self
+    {
+        if ($this->video->removeElement($video)) {
+            // set the owning side to null (unless already changed)
+            if ($video->getUser() === $this) {
+                $video->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+
+
 }

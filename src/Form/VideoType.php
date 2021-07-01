@@ -24,31 +24,7 @@ class VideoType extends AbstractType
             ->add('difficulty')
             ->add('programming_date')
             ->add('average_grade')
-            ->add('media', FileType::class,[
-                'label' => 'Joindre votre video',
-                'data_class' => Media::class,
-                'mapped' => false,
-                'required' => false,
-//                'constraints' => [
-//                    new File([
-//                        'maxSize' => '50M',
-//                        'mimeTypesMessage' => 'Veuillez choisir un document au format pdf ou pptx',
-//                        'mimeTypes' => [
-//                            new File([
-//                                'maxSize' => '50M',
-//                                'mimeTypesMessage' => 'Veuillez choisir une video de type .mpeg, .ogv, .webm ',
-//                                'mimeTypes' => [
-//                                    'video/x-msvideo',
-//                                    'video/mpeg',
-//                                    'video/ogg',
-//                                    'video/webm'
-//                                ]
-//                            ])
-//
-//                        ]
-//                    ]),
-//                ],
-            ])
+
         ;
     }
 

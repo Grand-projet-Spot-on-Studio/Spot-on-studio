@@ -1,6 +1,11 @@
 {% extends ('base.html.twig') %}
 {% block body %}
-<div>
-    coucou
-</div>
+    <h1>{{ video.title }}</h1>
+    <p>{{ video.description }}</p>
+    {% if video.media is not empty %}
+    <video src="{{ asset('video/') }}{{ video.media.url }}"></video>
+    {% endif %}
+    <span>{{ video.difficulty }}</span>
+    <span>{{ video.duration }}</span>
+    <span></span>
 {% endblock %}

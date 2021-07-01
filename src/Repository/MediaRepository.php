@@ -19,6 +19,18 @@ class MediaRepository extends ServiceEntityRepository
         parent::__construct($registry, Media::class);
     }
 
+    public function findByVideo($id)
+    {
+        return $this->createQueryBuilder('m')
+            ->select('m')
+            ->leftJoin('m.video','v')
+            ->where('v.id = :id')
+            ->setParameter('id',$id)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+    }
+
     // /**
     //  * @return Media[] Returns an array of Media objects
     //  */

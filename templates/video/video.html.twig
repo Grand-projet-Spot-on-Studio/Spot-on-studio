@@ -1,6 +1,15 @@
 {% extends 'base.html.twig' %}
+
 {% block body %}
-<span>coucou</span>
-<div>
-</div>
+
+    {% for video in videos %}
+    <h1>{{ video.title }}</h1>
+    <p>{{ video.description }}</p>
+    <span>{{ video.difficulty }}</span>
+    <a href="{{ path ('show_video' , {'id':video.id}) }}">La video</a>
+    <a href="{{ path('delete_video', {'id' : video.id}) }}">supprimer la video</a>
+    <a href="{{ path('update_video', {'id' : video.id}) }}">modifier la video</a>
+    <a href="{{ path('media_video'), }}"></a>
+    {% endfor %}
+
 {% endblock %}
