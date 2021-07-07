@@ -76,7 +76,7 @@ class Video
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="video")
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="video", cascade={"persist", "remove"})
      */
     private $media;
 

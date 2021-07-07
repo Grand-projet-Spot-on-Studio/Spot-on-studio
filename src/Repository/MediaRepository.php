@@ -21,15 +21,23 @@ class MediaRepository extends ServiceEntityRepository
 
     public function findByVideo($id)
     {
+        //j'appele mon entité media que je renomme 'm'
         return $this->createQueryBuilder('m')
+            //je fais un select sur mon entité media
             ->select('m')
+            //je fais un join avec mon entité video
             ->leftJoin('m.video','v')
+            //je trie par id de mon entité video
             ->where('v.id = :id')
+            //la methode me permet d'éviter les injections sql
             ->setParameter('id',$id)
+            //je termine ma requete avec cette methode
             ->getQuery()
+            //je renvoi les resultat
             ->getOneOrNullResult();
 
     }
+
 
     // /**
     //  * @return Media[] Returns an array of Media objects

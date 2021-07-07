@@ -69,7 +69,7 @@ class Media
         return $this;
     }
 
-    public function getVideo(): ?Video
+    public function getVideo(): ArrayCollection
     {
         return $this->video;
     }

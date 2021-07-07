@@ -13,10 +13,8 @@ class MediaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
-            ->add('url')
-            ->add('video', FileType::class,[
-                'label' => 'Joindre votre video',
+            ->add('url', FileType::class,[
+                'label' => 'Joindre votre fichier',
                 'data_class' => Media::class,
                 'mapped' => false,
                 'required' => false,

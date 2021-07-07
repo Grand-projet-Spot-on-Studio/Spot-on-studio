@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Media;
 use App\Entity\Video;
 use App\Form\VideoType;
+use App\Repository\MediaRepository;
 use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,9 +22,10 @@ class VideoController extends AbstractController
      * @Route ("display/video", name="display_video")
      */
 
-    public function displayVideo(VideoRepository $videoRepository)
+    public function displayVideo(VideoRepository $videoRepository, MediaRepository $mediaRepository)
     {
-        $videos = $videoRepository->findAll();
+        $videos = $videoRepository->findPictureVideo();
+
         return $this->render('video/video.html.twig',[
             'videos'=>$videos
         ]);
@@ -43,14 +45,33 @@ class VideoController extends AbstractController
 
             $video = $form->getData();
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
+            if($form->isSubmitted() && $form->isValid()){
+                $newMedia = $form['media']->getData();
+
+                $newfiles = md5(uniqid()) . '.' . $newMedia->guessExtension();
+                try {
+                    $newMedia->move(
+                        $this->getParameter('video_directory'),
+                        $newfiles
+                    );
+
+                } catch (FileException $e) {
+
+                    throw new \Exception("le flux vidéo n\'a pas été enregistré");
+
+                }
+                $media = new Media();
+                $media->setVideo($video);
+
+                $media->setName('picture');
+                $media->setUrl($newfiles);
+                $entityManager->persist($media);
+
+            }
 
             $entityManager->persist($video);
 
-            $media = new Media();
-            $media->setVideo($video);
 
-
-            $entityManager->persist($media);
 
             $entityManager->flush();
             $this->addFlash('success',
@@ -79,13 +100,13 @@ class VideoController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
 
             $video = $form->getData();
-            $media = $form->get('media')->getData();
+            //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
+            if($form->isSubmitted() && $form->isValid()){
+                $newMedia = $form['media']->getData();
 
-
-            if(!empty($media)){
-                $newfiles = md5(uniqid()) . '.' . $media->guessExtension();
+                $newfiles = md5(uniqid()) . '.' . $newMedia->guessExtension();
                 try {
-                    $media->move(
+                    $newMedia->move(
                         $this->getParameter('video_directory'),
                         $newfiles
                     );
@@ -96,22 +117,19 @@ class VideoController extends AbstractController
 
                 }
                 $media = new Media();
+                $media->setVideo($video);
 
-                //dans l'entité media le champ url est remplie par le nom qui est dans $newfile
-                $media->setUrl($newfiles)
-                    //le nom de mon media est le meme que le titre de la video
-                    ->setName($form->get('title')->getData());
-
+                $media->setName('picture');
+                $media->setUrl($newfiles);
                 $entityManager->persist($media);
-
             }
 
             $entityManager->persist($video);
+
             $entityManager->flush();
             $this->addFlash('success',
-                'le cours a été modifié'
+                'le cours a été créé'
             );
-
             return $this->redirectToRoute('display_video');
         }
         return $this->render('video/insert_update_video.html.twig',[

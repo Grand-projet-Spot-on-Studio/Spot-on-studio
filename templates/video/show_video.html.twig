@@ -3,9 +3,11 @@
     <h1>{{ video.title }}</h1>
     <p>{{ video.description }}</p>
     {% if video.media is not empty %}
-    <video src="{{ asset('video/') }}{{ video.media.url }}"></video>
+        <img src="{{ asset('video/') }}{{ video.media[0].url }}">
     {% endif %}
     <span>{{ video.difficulty }}</span>
     <span>{{ video.duration }}</span>
     <span></span>
+
+    {{ dump(video.media) }}
 {% endblock %}
