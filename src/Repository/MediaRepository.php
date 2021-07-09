@@ -33,7 +33,7 @@ class MediaRepository extends ServiceEntityRepository
             ->setParameter('id',$id)
             //je termine ma requete avec cette methode
             ->getQuery()
-            //je renvoi les resultat
+            //je renvoi le resultat
             ->getOneOrNullResult();
 
     }

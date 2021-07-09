@@ -9,7 +9,6 @@ use App\Entity\Studio;
 use App\Form\StudioType;
 use App\Repository\StudioRepository;
 use App\Repository\VideoRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -19,13 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class StudioController extends AbstractController
 {
     /**
-     * @Route ("/studio", name="display_studio")
+     * @Route ("/display/studio", name="display_studio")
      */
     public function displayStudio(StudioRepository $repository)
     {
-        $studio = $repository->findAll();
+        $studios = $repository->findAll();
         return $this->render('studio/display.studio.html.twig', [
-            'studio' => $studio
+            'studios' => $studios
         ]);
     }
 
@@ -33,7 +32,7 @@ class StudioController extends AbstractController
      * @Route ("/insert/studio", name="insert_studio")
      */
 
-    public function insertStudio(EntityManager $entityManager, Request $request)
+    public function insertStudio(EntityManagerInterface $entityManager, Request $request)
     {
         $studio = new Studio();
 
@@ -46,7 +45,7 @@ class StudioController extends AbstractController
             $studio = $form->getData();
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             $media = $form->get('media')->getData();
-            if (!empty($media)) {
+            if(!empty($media)){
                 $newfiles = md5(uniqid()) . '.' . $media->guessExtension();
                 try {
                     $media->move(
@@ -68,8 +67,8 @@ class StudioController extends AbstractController
                 $studio->addMedia($studio);
 
                 $entityManager->persist($media);
-
             }
+
             $entityManager->persist($studio);
             $entityManager->flush();
             $this->addFlash('success',
@@ -137,7 +136,6 @@ class StudioController extends AbstractController
             'video' => $form->createView()
         ]);
 
-
     }
 
     /**
@@ -161,12 +159,14 @@ class StudioController extends AbstractController
     /**
      * @Route("/show/studio/{id}", name="show_stuido")
      */
-    public function showStudio(StudioRepository $studioRepository, $id)
+    public function showStudio(StudioRepository $studioRepository, $id, VideoRepository $videoRepository)
     {
         $studio = $studioRepository->find($id);
+        $videos = $videoRepository->findBy(['studio' => $id]);
         return $this->render('studio/show_studio.html.twig',
             [
-                'studio'=>$studio
+                'videos' => $videos,
+                'studio' => $studio
             ]);
     }
 

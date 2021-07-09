@@ -26,18 +26,20 @@ class Status
 
 
     /**
-     * @ORM\ManyToOne(targetEntity=Studio::class, inversedBy="status")
-     */
-    private $studio;
-
-    /**
      * @ORM\OneToMany(targetEntity=Video::class, mappedBy="status")
      */
     private $video;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Studio::class, mappedBy="statuseses")
+     */
+    private $studio;
+
+
     public function __construct()
     {
         $this->video = new ArrayCollection();
+        $this->studio = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -57,18 +59,6 @@ class Status
         return $this;
     }
 
-
-    public function getStudio(): ?Studio
-    {
-        return $this->studio;
-    }
-
-    public function setStudio(?Studio $studio): self
-    {
-        $this->studio = $studio;
-
-        return $this;
-    }
 
     /**
      * @return Collection|Video[]
@@ -94,6 +84,36 @@ class Status
             // set the owning side to null (unless already changed)
             if ($video->getStatus() === $this) {
                 $video->setStatus(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Studio[]
+     */
+    public function getStudio(): Collection
+    {
+        return $this->studio;
+    }
+
+    public function addStudio(Studio $studio): self
+    {
+        if (!$this->studio->contains($studio)) {
+            $this->studio[] = $studio;
+            $studio->setStatus($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStudio(Studio $studio): self
+    {
+        if ($this->studio->removeElement($studio)) {
+            // set the owning side to null (unless already changed)
+            if ($studio->getStatus() === $this) {
+                $studio->setStatus(null);
             }
         }
 

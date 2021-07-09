@@ -32,6 +32,59 @@ class MediaController extends AbstractController
         $media = new Media();
         $video = $videoRepository->find($id);
 
+
+        $form = $this->createForm(MediaType::class, $media);
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $newMedia = $form['url']->getData();
+
+            $newfiles = md5(uniqid()) . '.' . $newMedia->guessExtension();
+            try {
+                $newMedia->move(
+                    $this->getParameter('video_directory'),
+                    $newfiles
+                );
+
+            } catch (FileException $e) {
+
+                throw new \Exception("le flux vidéo n\'a pas été enregistré");
+
+            }
+
+            $media->setVideo($video);
+            $media->setName('video');
+            $media->setUrl($newfiles);
+            $entityManager->persist($media);
+            $entityManager->flush();
+            return $this->redirectToRoute('show_video',[
+                'id'=>$id,
+
+            ]);
+
+        }
+        return $this->render('video/insert_update_image_stream.html.twig',[
+            'media' => $form->createView(),
+            'video'=>$video
+        ]);
+    }
+
+    /**
+     * @Route("update/media/video/{id}", name="update_media_video")
+     */
+    public function UpdateMediaVideo(
+        EntityManagerInterface $entityManager,
+        MediaRepository $mediaRepository,
+        VideoRepository $videoRepository,
+        $id,
+        Request $request
+    )
+    {
+
+        $media = $mediaRepository->findBy(['video' => $id]);
+        $video = $videoRepository->find($id);
+
         $form = $this->createForm(MediaType::class, $media);
 
         $form->handleRequest($request);
@@ -63,61 +116,9 @@ class MediaController extends AbstractController
             ]);
 
         }
-        return $this->render('video/insert_update.html.twig',[
+        return $this->render('video/insert_update_image_stream.html.twig',[
             'media' => $form->createView()
         ]);
-    }
-
-    /**
-     * @Route("/media/picture/{id}", name="media_picture")
-     */
-    public function mediaPicture(
-        EntityManagerInterface $entityManager,
-        MediaRepository $mediaRepository,
-        $id,
-        Request $request
-    )
-    {
-
-        $media = $mediaRepository->findByVideo($id);
-
-        $form = $this->createForm(MediaType::class, $media);
-
-        $form->handleRequest($request);
-
-        if($form->isSubmitted() && $form->isValid()){
-            $medias = $form['url']->getData();
-
-            $newfiles = md5(uniqid()) . '.' . $medias->guessExtension();
-            try {
-                $medias->move(
-                    $this->getParameter('video_directory'),
-                    $newfiles
-                );
-
-            } catch (FileException $e) {
-
-                throw new \Exception("le flux vidéo n\'a pas été enregistré");
-
-            }
-            $media = new Media;
-
-            $media->setName('picture');
-            $media->setUrl($newfiles);
-            $entityManager->persist($media);
-            $entityManager->flush();
-            return $this->redirectToRoute('show_video',[
-                'id'=>$id
-            ]);
-
-        }
-        return $this->render('video/insert_update.html.twig',[
-            'media' => $form->createView()
-        ]);
-
-
-
-
     }
 
 }

@@ -5,9 +5,11 @@ namespace App\Controller;
 
 
 use App\Entity\Media;
+use App\Entity\Status;
 use App\Entity\Video;
 use App\Form\VideoType;
 use App\Repository\MediaRepository;
+use App\Repository\StatusRepository;
 use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,14 +24,15 @@ class VideoController extends AbstractController
      * @Route ("display/video", name="display_video")
      */
 
-    public function displayVideo(VideoRepository $videoRepository, MediaRepository $mediaRepository)
+    public function displayVideo(VideoRepository $videoRepository)
     {
-        $videos = $videoRepository->findPictureVideo();
+        $videos = $videoRepository->findAll();
 
         return $this->render('video/video.html.twig',[
             'videos'=>$videos
         ]);
     }
+
     /**
      * @Route ("/insert/video", name="insert_video")
      */
@@ -46,6 +49,20 @@ class VideoController extends AbstractController
             $video = $form->getData();
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()){
+
+                $status = $form['status']->getData();
+                if($status == 1) {
+                    $status = 'notPublished';
+                }
+                else {
+                   $status = 'asPublished';
+                }
+
+                $dataStatus = new Status();
+                $dataStatus->setName($status);
+                $dataStatus->addVideo($video);
+                $entityManager->persist($dataStatus);
+
                 $newMedia = $form['media']->getData();
 
                 $newfiles = md5(uniqid()) . '.' . $newMedia->guessExtension();
@@ -57,12 +74,11 @@ class VideoController extends AbstractController
 
                 } catch (FileException $e) {
 
-                    throw new \Exception("le flux vidéo n\'a pas été enregistré");
+                  throw new \Exception("le flux vidéo n\'a pas été enregistré");
 
                 }
                 $media = new Media();
                 $media->setVideo($video);
-
                 $media->setName('picture');
                 $media->setUrl($newfiles);
                 $entityManager->persist($media);

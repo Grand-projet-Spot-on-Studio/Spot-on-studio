@@ -25,7 +25,7 @@ class Studio
     private $name;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $phone;
 
@@ -49,7 +49,6 @@ class Studio
      */
     private $email;
 
-
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="studio")
      */
@@ -60,15 +59,24 @@ class Studio
      */
     private $user_customer;
 
+
+
     /**
-     * @ORM\OneToMany(targetEntity=Status::class, mappedBy="studio")
+     * @ORM\OneToMany(targetEntity=Media::class, mappedBy="studio")
+     */
+    private $media;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="studio")
      */
     private $status;
+
+
 
     public function __construct()
     {
         $this->user_customer = new ArrayCollection();
-        $this->status = new ArrayCollection();
+        $this->media = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -185,33 +193,48 @@ class Studio
         return $this;
     }
 
+
     /**
-     * @return Collection|Status[]
+     * @return Collection|Media[]
      */
-    public function getStatus(): Collection
+    public function getMedia(): Collection
     {
-        return $this->status;
+        return $this->media;
     }
 
-    public function addStatus(Status $status): self
+    public function addMedia(Media $media): self
     {
-        if (!$this->status->contains($status)) {
-            $this->status[] = $status;
-            $status->setStudio($this);
+        if (!$this->media->contains($media)) {
+            $this->media[] = $media;
+            $media->setStudio($this);
         }
 
         return $this;
     }
 
-    public function removeStatus(Status $status): self
+    public function removeMedia(Media $media): self
     {
-        if ($this->status->removeElement($status)) {
+        if ($this->media->removeElement($media)) {
             // set the owning side to null (unless already changed)
-            if ($status->getStudio() === $this) {
-                $status->setStudio(null);
+            if ($media->getStudio() === $this) {
+                $media->setStudio(null);
             }
         }
 
         return $this;
     }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+
 }

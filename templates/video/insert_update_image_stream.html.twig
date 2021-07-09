@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <article>
+        {{ form_start(media)}}
+
+        {{ form_label(media.url) }}
+        {{ form_widget(media.url) }}
+
+        <button type="submit">Envoyer</button>
+
+        {{ form_end(media) }}
+        <a href="{{ path ('show_video' , {'id': video.id}) }}">Revenir à la vidéo</a>
+    </article>
+{% endblock %}

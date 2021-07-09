@@ -64,7 +64,6 @@ class Video
      */
     private $averageGrade;
 
-
     /**
      * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="video")
      */

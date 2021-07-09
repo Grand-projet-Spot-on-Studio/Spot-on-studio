@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+{{ form_start(studio) }}
+    {{ form_label(studio.name) }}
+    {{ form_widget(studio.name) }}
+    {{ form_label(studio.phone) }}
+    {{ form_widget(studio.phone) }}
+    {{ form_label(studio.adress) }}
+    {{ form_widget(studio.adress) }}
+    {{ form_label(studio.zipcode) }}
+    {{ form_widget(studio.zipcode) }}
+    {{ form_label(studio.city) }}
+    {{ form_widget(studio.city) }}
+    {{ form_label(studio.email) }}
+    {{ form_widget(studio.email) }}
+    {{ form_label(studio.media) }}
+    {{ form_widget(studio.media) }}
+    <button type="submit">Envoyer</button>
+{{ form_end(studio) }}
+
+{% endblock %}

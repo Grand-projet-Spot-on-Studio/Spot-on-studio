@@ -34,6 +34,11 @@ class Media
      */
     private $video;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Studio::class, inversedBy="media")
+     */
+    private $studio;
+
 
     public function __construct()
     {
@@ -77,6 +82,18 @@ class Media
     public function setVideo(?Video $video): self
     {
         $this->video = $video;
+
+        return $this;
+    }
+
+    public function getStudio(): ?Studio
+    {
+        return $this->studio;
+    }
+
+    public function setStudio(?Studio $studio): self
+    {
+        $this->studio = $studio;
 
         return $this;
     }

@@ -3,8 +3,10 @@
 namespace App\Form;
 
 use App\Entity\Media;
+use App\Entity\Status;
 use App\Entity\Video;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -24,6 +26,12 @@ class VideoType extends AbstractType
             ->add('difficulty')
             ->add('programming_date')
             ->add('average_grade')
+            ->add('status', CheckboxType::class,[
+                'label' => 'veuillez cocher si la vidéo doit être publié plus tard',
+                'data_class' => Status::class,
+                'mapped' => false,
+                'required' => false
+            ])
             ->add('media', FileType::class,[
                 'label' => 'Joindre votre miniature',
                 'data_class' => Media::class,
