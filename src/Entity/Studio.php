@@ -71,6 +71,10 @@ class Studio
      */
     private $status;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Coach::class, inversedBy="studio")
+     */
+    private $coach;
 
 
     public function __construct()
@@ -232,6 +236,18 @@ class Studio
     public function setStatus(?Status $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCoach(): ?Coach
+    {
+        return $this->coach;
+    }
+
+    public function setCoach(?Coach $coach): self
+    {
+        $this->coach = $coach;
 
         return $this;
     }

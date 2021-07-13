@@ -50,13 +50,9 @@ class VideoController extends AbstractController
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()){
 
+                //pour changer en base de donné le 0 ou 1
                 $status = $form['status']->getData();
-                if($status == 1) {
-                    $status = 'notPublished';
-                }
-                else {
-                   $status = 'asPublished';
-                }
+                ($status == 1) ? $status = 'notPublished' : $status = 'asPublished';
 
                 $dataStatus = new Status();
                 $dataStatus->setName($status);

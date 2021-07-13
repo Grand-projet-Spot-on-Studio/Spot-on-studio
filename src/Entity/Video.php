@@ -79,9 +79,17 @@ class Video
      */
     private $media;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Coach::class, mappedBy="video")
+     */
+    private $coach;
+
+
     public function __construct()
     {
         $this->media = new ArrayCollection();
+        $this->coach = new ArrayCollection();
+
     }
 
 
@@ -252,6 +260,38 @@ class Video
 
         return $this;
     }
+
+    /**
+     * @return Collection|Coach[]
+     */
+    public function getCoach(): Collection
+    {
+        return $this->coach;
+    }
+
+    public function addCoach(Coach $coach): self
+    {
+        if (!$this->coach->contains($coach)) {
+            $this->coach[] = $coach;
+            $coach->setVideo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCoach(Coach $coach): self
+    {
+        if ($this->coach->removeElement($coach)) {
+            // set the owning side to null (unless already changed)
+            if ($coach->getVideo() === $this) {
+                $coach->setVideo(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 
 
 

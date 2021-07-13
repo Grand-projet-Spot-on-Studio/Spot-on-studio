@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<article>
+{{ form_start(coach) }}
+
+    {{ form_label(coach.name) }}
+    {{ form_widget(coach.name) }}
+    {{ form_label(coach.firstname) }}
+    {{ form_widget(coach.firstname) }}
+    {{ form_label(coach.media) }}
+    {{ form_widget(coach.media) }}
+
+    <button type="submit">Envoyer</button>
+
+
+{{ form_end(coach) }}
+</article>
+{% endblock %}

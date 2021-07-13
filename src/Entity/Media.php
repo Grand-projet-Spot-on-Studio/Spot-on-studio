@@ -39,6 +39,11 @@ class Media
      */
     private $studio;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Coach::class, mappedBy="media", cascade={"persist", "remove"})
+     */
+    private $coach;
+
 
     public function __construct()
     {
@@ -74,7 +79,7 @@ class Media
         return $this;
     }
 
-    public function getVideo(): ArrayCollection
+    public function getVideo()
     {
         return $this->video;
     }
@@ -98,13 +103,27 @@ class Media
         return $this;
     }
 
+    public function getCoach(): ?Coach
+    {
+        return $this->coach;
+    }
 
+    public function setCoach(?Coach $coach): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($coach === null && $this->coach !== null) {
+            $this->coach->setMedia(null);
+        }
 
+        // set the owning side of the relation if necessary
+        if ($coach !== null && $coach->getMedia() !== $this) {
+            $coach->setMedia($this);
+        }
 
+        $this->coach = $coach;
 
-
-
-
+        return $this;
+    }
 
 
 

@@ -31,7 +31,7 @@ class Status
     private $video;
 
     /**
-     * @ORM\OneToMany(targetEntity=Studio::class, mappedBy="statuseses")
+     * @ORM\OneToMany(targetEntity=Studio::class, mappedBy="status")
      */
     private $studio;
 

@@ -6,6 +6,7 @@
 parameters:
     video_directory: '%kernel.project_dir%/public/video'
     studio_directory: '%kernel.project_dir%/public/studio'
+    coach_directory: '%kernel.project_dir%/public/coach'
 
 services:
     # default configuration for services in *this* file

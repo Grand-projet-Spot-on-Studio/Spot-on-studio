@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+{% for coach in coaches %}
+    {{ coach.name }}
+    {{ coach.firstname }}
+    {% for media in coach.media %}
+        <img src="{{ asset ('coach/') }}{{ media.url }}" alt="{{ coach.name }}">
+    {% endfor %}
+{% endfor %}
+{% endblock %}
