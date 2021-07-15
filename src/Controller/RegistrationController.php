@@ -70,7 +70,6 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
         ]);
     }
-
     /**
      * @Route("/register/responsible", name="app_register_responsible_studio")
      */
