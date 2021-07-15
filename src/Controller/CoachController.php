@@ -127,7 +127,7 @@ class CoachController extends AbstractController
                     ->setName($form->get('name')->getData());
 
                 $coach->setMedia($media);
-                if(is_null($media->getVideo()[0])) {
+                if(is_null($media->getVideo()[])) {
                     $media->setVideo(null);
                 }
 

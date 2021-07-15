@@ -20,7 +20,7 @@ class MediaController extends AbstractController
     /**
      * @Route("/media/video/{id}", name="media_video")
      */
-    public function mediaVideo(
+    public function insertMediaVideo(
         EntityManagerInterface $entityManager,
         MediaRepository $mediaRepository,
         VideoRepository $videoRepository,
@@ -73,7 +73,7 @@ class MediaController extends AbstractController
     /**
      * @Route("update/media/video/{id}", name="update_media_video")
      */
-    public function UpdateMediaVideo(
+    public function updateMediaVideo(
         EntityManagerInterface $entityManager,
         MediaRepository $mediaRepository,
         VideoRepository $videoRepository,
@@ -81,9 +81,10 @@ class MediaController extends AbstractController
         Request $request
     )
     {
-
-        $media = $mediaRepository->findBy(['video' => $id]);
+        $media = new Media;
         $video = $videoRepository->find($id);
+
+
 
         $form = $this->createForm(MediaType::class, $media);
 
@@ -112,7 +113,8 @@ class MediaController extends AbstractController
             $entityManager->persist($media);
             $entityManager->flush();
             return $this->redirectToRoute('show_video',[
-                'id'=>$id
+                'id'=>$id,
+                'video'=>$video
             ]);
 
         }

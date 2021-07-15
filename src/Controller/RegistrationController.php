@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Studio;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\StudioRepository;
 use App\Security\EmailVerifier;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,32 +27,31 @@ class RegistrationController extends AbstractController
         $this->emailVerifier = $emailVerifier;
     }
 
+    /**
+     * @Route("/register", name="app_register")
+     */
+    public function registerResponsible(Request $request, UserPasswordEncoderInterface $passwordEncoder, StudioRepository $studioRepository): Response
+    {
+        $user = new User();
+        $form = $this->createForm(RegistrationFormType::class, $user);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // encode the plain password
+            $user->setPassword(
+                $passwordEncoder->encodePassword(
+                    $user,
+                    $form->get('plainPassword')->getData()
+                )
+
+            );
 
 
-//    /**
-//     * @Route("/register", name="app_register")
-//     */
-//    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
-//    {
-//        $user = new User();
-//        $form = $this->createForm(RegistrationFormType::class, $user);
-//
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            // encode the plain password
-//            $user->setPassword(
-//                $passwordEncoder->encodePassword(
-//                    $user,
-//                    $form->get('plainPassword')->getData()
-//                )
-//
-//            );
-//
-//            $entityManager = $this->getDoctrine()->getManager();
-//            $entityManager->persist($user);
-//            $entityManager->flush();
-//
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($user);
+            $entityManager->flush();
+
 //            // generate a signed url and email it to the user
 //            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
 //                (new TemplatedEmail())
@@ -60,39 +61,63 @@ class RegistrationController extends AbstractController
 //                    ->htmlTemplate('registration/confirmation_email.html.twig')
 //            );
 //            // do anything else you need here, like send an email
-//
-//            return $this->redirectToRoute('home_page');
-//
-//        }
-//
-//        return $this->render('registration/register.html.twig', [
-//            'registrationForm' => $form->createView(),
-//        ]);
-//    }
 
+            return $this->redirectToRoute('home_page');
 
-    /**
-     * @Route("/email", name="test")
-     */
-    public function sendEmail(MailerInterface $mailer): Response
-    {
-        $email = (new Email())
-            ->from('kevin.vandenbussche.pro@gmail.com')
-            ->to('nivek033@msn.com')
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
-            ->subject('Time for Symfony Mailer!')
-            ->text('Sending emails is fun again!')
-            ->html('<p>See Twig integration for better HTML integration!</p>');
+        }
 
-        $mailer->send($email);
-        return $this ->redirectToRoute('home_page');
-
+        return $this->render('registration/register.html.twig', [
+            'registrationForm' => $form->createView(),
+        ]);
     }
 
+    /**
+     * @Route("/register/responsible", name="app_register_responsible_studio")
+     */
+    public function registerResponsibleStudio(Request $request, UserPasswordEncoderInterface $passwordEncoder, StudioRepository $studioRepository): Response
+    {
+        $user = new User();
+        $form = $this->createForm(RegistrationFormType::class, $user);
 
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // encode the plain password
+            $user->setPassword(
+                $passwordEncoder->encodePassword(
+                    $user,
+                    $form->get('plainPassword')->getData()
+                )
+
+            );
+
+            $studio = new Studio();
+            $entityManager = $this->getDoctrine()->getManager();
+            $studio->setName('newStudio');
+            $studio->setUserEmployed($user);
+            $entityManager->persist($studio);
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+//            // generate a signed url and email it to the user
+//            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+//                (new TemplatedEmail())
+//                    ->from(new Address('kevin.vandenbussche.pro@gmail.com', 'Spot On Studio'))
+//                    ->to($user->getEmail())
+//                    ->subject('veuillez confirmer le mail')
+//                    ->htmlTemplate('registration/confirmation_email.html.twig')
+//            );
+//            // do anything else you need here, like send an email
+
+            return $this->redirectToRoute('show_user', ['id'=>$user->getId()]);
+
+        }
+
+        return $this->render('registration/register.html.twig', [
+            'registrationForm' => $form->createView(),
+        ]);
+    }
 
     /**
      * @Route("/verify/email", name="app_verify_email")

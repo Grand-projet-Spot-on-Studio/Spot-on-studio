@@ -45,7 +45,6 @@ class VideoController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-
             $video = $form->getData();
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()){
@@ -83,8 +82,6 @@ class VideoController extends AbstractController
 
             $entityManager->persist($video);
 
-
-
             $entityManager->flush();
             $this->addFlash('success',
                 'le cours a été créé'
@@ -94,8 +91,6 @@ class VideoController extends AbstractController
         return $this->render('video/insert_update_video.html.twig',[
                 'video' => $form->createView()
         ]);
-
-
     }
 
     /**
@@ -110,7 +105,6 @@ class VideoController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-
             $video = $form->getData();
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()){
@@ -130,7 +124,6 @@ class VideoController extends AbstractController
                 }
                 $media = new Media();
                 $media->setVideo($video);
-
                 $media->setName('picture');
                 $media->setUrl($newfiles);
                 $entityManager->persist($media);
@@ -147,8 +140,6 @@ class VideoController extends AbstractController
         return $this->render('video/insert_update_video.html.twig',[
             'video' => $form->createView()
         ]);
-
-
     }
 
     /**

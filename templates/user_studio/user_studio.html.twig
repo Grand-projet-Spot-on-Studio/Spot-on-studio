@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div>
+        {{ user.name }}
+        {{ user.firstname }}
+        {{ user.email }}
+
+        <a href="{{ path('update_studio', {'id' : studio.id}) }}">créer votre studio</a>
+        <a href="{{ path('update_user', {'id' : user.id}) }}">modifier votre profil</a>
+    </div>
+{% endblock %}

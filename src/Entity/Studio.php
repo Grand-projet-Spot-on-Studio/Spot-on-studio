@@ -60,7 +60,6 @@ class Studio
     private $user_customer;
 
 
-
     /**
      * @ORM\OneToMany(targetEntity=Media::class, mappedBy="studio")
      */
@@ -88,7 +87,7 @@ class Studio
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName()
     {
         return $this->name;
     }

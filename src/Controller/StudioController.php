@@ -127,13 +127,13 @@ class StudioController extends AbstractController
             $entityManager->persist($studio);
             $entityManager->flush();
             $this->addFlash('success',
-                'le cours a été modifié'
+                'le studio a été modifié ou crée'
             );
 
-            return $this->redirectToRoute('display_video');
+            return $this->redirectToRoute('show_studio', ['id'=>$studio->getid()]);
         }
-        return $this->render('video/insert_update_video.html.twig',[
-            'video' => $form->createView()
+        return $this->render('studio/insert_update_studio.html.twig',[
+            'studio' => $form->createView()
         ]);
 
     }
@@ -157,15 +157,14 @@ class StudioController extends AbstractController
     }
 
     /**
-     * @Route("/show/studio/{id}", name="show_stuido")
+     * @Route("/show/studio/{id}", name="show_studio")
      */
     public function showStudio(StudioRepository $studioRepository, $id, VideoRepository $videoRepository)
     {
         $studio = $studioRepository->find($id);
-        $videos = $videoRepository->findBy(['studio' => $id]);
         return $this->render('studio/show_studio.html.twig',
             [
-                'videos' => $videos,
+
                 'studio' => $studio
             ]);
     }
