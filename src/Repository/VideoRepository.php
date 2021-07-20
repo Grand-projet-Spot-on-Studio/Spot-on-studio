@@ -19,46 +19,24 @@ class VideoRepository extends ServiceEntityRepository
         parent::__construct($registry, Video::class);
     }
 
+    public function datePublished()
+    {
+        return $this->createQueryBuilder('v')
+            ->Select('v.programmingDate')
+            ->getQuery()
+            ->getResult();
+    }
 
-// requete pour recuperer a la vue que les miniatures
-//    public function displayPictureOnly()
+
+//    //requete pour recuperer a la vue que les status
+//    public function statusPublished()
 //    {
 //        return $this->createQueryBuilder('v')
 //            ->select('v')
-//            ->leftJoin('v.media','m')
-//            ->addSelect('m.url')
-//            ->where('m.name = :name')
-//            ->setParameter('name', 'picture')
+//            ->leftJoin('v.status','s')
+//            ->addSelect('s.name')
 //            ->getQuery()
 //            ->getResult();
 //    }
 
-    // /**
-    //  * @return Video[] Returns an array of Video objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('v')
-            ->andWhere('v.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('v.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Video
-    {
-        return $this->createQueryBuilder('v')
-            ->andWhere('v.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

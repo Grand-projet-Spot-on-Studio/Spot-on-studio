@@ -6,6 +6,7 @@ use App\Repository\VideoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @ORM\Entity(repositoryClass=VideoRepository::class)
@@ -66,11 +67,13 @@ class Video
 
     /**
      * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="video")
+     * @JoinColumn(onDelete="CASCADE")
      */
     private $status;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="video")
+     * @JoinColumn(onDelete="CASCADE")
      */
     private $user;
 
@@ -80,18 +83,29 @@ class Video
     private $media;
 
     /**
-     * @ORM\OneToMany(targetEntity=Coach::class, mappedBy="video")
+     * @ORM\ManyToOne(targetEntity=Coach::class, inversedBy="video")
+     * @JoinColumn(onDelete="CASCADE")
      */
     private $coach;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Studio::class, inversedBy="video")
+     */
+    private $studio;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $createdAt;
+
+
 
 
     public function __construct()
     {
         $this->media = new ArrayCollection();
-        $this->coach = new ArrayCollection();
-
+        $this->createdAt = new \DateTime('now');
     }
-
 
     public function getId(): ?int
     {
@@ -261,38 +275,40 @@ class Video
         return $this;
     }
 
-    /**
-     * @return Collection|Coach[]
-     */
-    public function getCoach(): Collection
+    public function getCoach(): ?Coach
     {
         return $this->coach;
     }
 
-    public function addCoach(Coach $coach): self
+    public function setCoach(?Coach $coach): self
     {
-        if (!$this->coach->contains($coach)) {
-            $this->coach[] = $coach;
-            $coach->setVideo($this);
-        }
+        $this->coach = $coach;
 
         return $this;
     }
 
-    public function removeCoach(Coach $coach): self
+    public function getStudio(): ?Studio
     {
-        if ($this->coach->removeElement($coach)) {
-            // set the owning side to null (unless already changed)
-            if ($coach->getVideo() === $this) {
-                $coach->setVideo(null);
-            }
-        }
+        return $this->studio;
+    }
+
+    public function setStudio(?Studio $studio): self
+    {
+        $this->studio = $studio;
 
         return $this;
     }
 
+    public function getcreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
 
+    public function setcreatedAt(\DateTimeInterface $CreatedAt): self
+    {
+        $this->createdAt = $CreatedAt;
 
-
+        return $this;
+    }
 
 }

@@ -7,9 +7,11 @@ namespace App\Controller;
 use App\Entity\Media;
 use App\Entity\Studio;
 use App\Form\StudioType;
+use App\Repository\StatusRepository;
 use App\Repository\StudioRepository;
 use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,9 +22,14 @@ class StudioController extends AbstractController
     /**
      * @Route ("/display/studio", name="display_studio")
      */
-    public function displayStudio(StudioRepository $repository)
+    public function displayStudio(StudioRepository $repository, PaginatorInterface $paginator, Request $request)
     {
         $studios = $repository->findAll();
+        $studios = $paginator->paginate(
+            $studios, // Requête contenant les données à paginer
+            $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
+            5 // Nombre de résultats par page
+        );
         return $this->render('studio/display.studio.html.twig', [
             'studios' => $studios
         ]);
@@ -61,8 +68,8 @@ class StudioController extends AbstractController
                 $media = new Media();
                 //dans l'entité media le champ url est remplie par le nom qui est dans $newfile
                 $media->setUrl($newfiles)
-                    //le nom de mon media est le meme que le titre de la video
-                    ->setName($form->get('name')->getData());
+                    //le nom de mon media
+                    ->setName('picture');
 
                 $studio->addMedia($studio);
 
@@ -115,9 +122,9 @@ class StudioController extends AbstractController
                 //dans l'entité media le champ url est remplie par le nom qui est dans $newfile
                 $media->setUrl($newfiles)
                     //le nom de mon media est le meme que le titre de la video
-                    ->setName($form->get('name')->getData());
+                    ->setName('picture');
 
-                $studio->addMedia($studio);
+                $studio->addMedia($media);
 
                 $entityManager->persist($media);
 
@@ -159,13 +166,34 @@ class StudioController extends AbstractController
     /**
      * @Route("/show/studio/{id}", name="show_studio")
      */
-    public function showStudio(StudioRepository $studioRepository, $id, VideoRepository $videoRepository)
+    public function showStudio(StudioRepository $studioRepository,
+                               $id,
+                               VideoRepository $videoRepository,
+                               PaginatorInterface $paginator,
+                               Request $request,
+                                StatusRepository $statusRepository
+    )
     {
         $studio = $studioRepository->find($id);
+        $videos = $videoRepository->findBy(['studio' => $id]);
+
+        $todayDay = new \DateTime('now');
+        $dateDatabase = $videoRepository->datePublished();
+
+        foreach ($videos as $video){
+            $status = $video->getStatus();
+            ($todayDay == $dateDatabase) ? $status->setName('asPublished') : $status->setName('notPublished');;
+        }
+
+        $videos = $paginator->paginate(
+            $videos, // Requête contenant les données à paginer (video)
+            $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
+            5 // Nombre de résultats par page
+        );
         return $this->render('studio/show_studio.html.twig',
             [
-
-                'studio' => $studio
+                'videos'=> $videos,
+                'studio' => $studio,
             ]);
     }
 

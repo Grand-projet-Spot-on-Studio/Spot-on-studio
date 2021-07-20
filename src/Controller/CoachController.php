@@ -9,6 +9,7 @@ use App\Form\CoachType;
 use App\Entity\Media;
 use App\Form\StudioType;
 use App\Repository\CoachRepository;
+use App\Repository\StudioRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -30,13 +31,13 @@ class CoachController extends AbstractController
     }
 
     /**
-     * @Route ("/insert/coach", name="insert_coach")
+     * @Route ("/insert/coach/{id}", name="insert_coach")
      */
 
-    public function insertCoach(EntityManagerInterface $entityManager, Request $request)
+    public function insertCoach($id, EntityManagerInterface $entityManager, Request $request, StudioRepository $studioRepository)
     {
         $coach = new Coach();
-
+        $studio = $studioRepository->find($id);
 
         $form = $this->createForm(CoachType::class, $coach);
 
@@ -68,16 +69,10 @@ class CoachController extends AbstractController
 
                 $coach->setMedia($media);
 
-                //l'entité media a besion d'une video ou une valeur null
-                //je verifie dans l'array collection video si il y a des donné a l'index 0
-                //si c'est null tu set un tableau avec des valeurs null
-                if(is_null($media->getVideo()[0])) {
-                    $media->setVideo(null);
-                }
-
                 $entityManager->persist($media);
-            }
 
+            }
+            $studio->addCoach($coach);
             $entityManager->persist($coach);
             $entityManager->flush();
             $this->addFlash('success',
@@ -123,14 +118,9 @@ class CoachController extends AbstractController
                 $media = new Media();
                 //dans l'entité media le champ url est remplie par le nom qui est dans $newfile
                 $media->setUrl($newfiles)
-
                     ->setName($form->get('name')->getData());
 
                 $coach->setMedia($media);
-                if(is_null($media->getVideo()[])) {
-                    $media->setVideo(null);
-                }
-
                 $entityManager->persist($media);
 
             }

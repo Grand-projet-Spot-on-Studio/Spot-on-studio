@@ -23,7 +23,7 @@ class StudioType extends AbstractType
             ->add('city')
             ->add('email')
             ->add('media', FileType::class,[
-                'label' => 'Joindre vos document',
+                'label' => 'Télécharger votre miniature',
                 'data_class' => Media::class,
                 'mapped' => false,
                 'required' => false,

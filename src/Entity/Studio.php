@@ -6,6 +6,7 @@ use App\Repository\StudioRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @ORM\Entity(repositoryClass=StudioRepository::class)
@@ -51,11 +52,13 @@ class Studio
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="studio")
+     * @JoinColumn(onDelete="CASCADE")
      */
     private $user_employed;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="studio")
+     * @JoinColumn(onDelete="CASCADE")
      */
     private $user_customer;
 
@@ -67,19 +70,27 @@ class Studio
 
     /**
      * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="studio")
+     * @JoinColumn(onDelete="CASCADE")
      */
     private $status;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Coach::class, inversedBy="studio")
+     * @ORM\OneToMany(targetEntity=Coach::class, mappedBy="studio")
      */
     private $coach;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Video::class, mappedBy="studio")
+     */
+    private $video;
 
 
     public function __construct()
     {
         $this->user_customer = new ArrayCollection();
         $this->media = new ArrayCollection();
+        $this->coach = new ArrayCollection();
+        $this->video = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -239,14 +250,56 @@ class Studio
         return $this;
     }
 
-    public function getCoach(): ?Coach
+
+
+    public function addCoach(Coach $coach): self
     {
-        return $this->coach;
+        if (!$this->coach->contains($coach)) {
+            $this->coach[] = $coach;
+            $coach->setStudio($this);
+        }
+
+        return $this;
     }
 
-    public function setCoach(?Coach $coach): self
+    public function removeCoach(Coach $coach): self
     {
-        $this->coach = $coach;
+        if ($this->coach->removeElement($coach)) {
+            // set the owning side to null (unless already changed)
+            if ($coach->getStudio() === $this) {
+                $coach->setStudio(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Video[]
+     */
+    public function getVideo(): Collection
+    {
+        return $this->video;
+    }
+
+    public function addVideo(Video $video): self
+    {
+        if (!$this->video->contains($video)) {
+            $this->video[] = $video;
+            $video->setStudio($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVideo(Video $video): self
+    {
+        if ($this->video->removeElement($video)) {
+            // set the owning side to null (unless already changed)
+            if ($video->getStudio() === $this) {
+                $video->setStudio(null);
+            }
+        }
 
         return $this;
     }

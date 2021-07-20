@@ -6,6 +6,7 @@ use App\Repository\CoachRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @ORM\Entity(repositoryClass=CoachRepository::class)
@@ -35,18 +36,20 @@ class Coach
     private $media;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Video::class, inversedBy="coach")
-     */
-    private $video;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Studio::class, mappedBy="coach")
+     * @ORM\ManyToOne(targetEntity=Studio::class, inversedBy="coach")
+     * @JoinColumn(onDelete="CASCADE")
      */
     private $studio;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Video::class, mappedBy="coach")
+     */
+    private $video;
 
     public function __construct()
     {
         $this->studio = new ArrayCollection();
+        $this->video = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,45 +93,47 @@ class Coach
         return $this;
     }
 
-    public function getVideo(): ?Video
+    public function getStudio(): ArrayCollection
     {
-        return $this->video;
+        return $this->studio;
     }
 
-    public function setVideo(?Video $video): self
+    public function setStudio(?Studio $studio): self
     {
-        $this->video = $video;
+        $this->studio = $studio;
 
         return $this;
     }
 
     /**
-     * @return Collection|Studio[]
+     * @return Collection|Video[]
      */
-    public function getStudio(): Collection
+    public function getVideo(): Collection
     {
-        return $this->studio;
+        return $this->video;
     }
 
-    public function addStudio(Studio $studio): self
+    public function addVideo(Video $video): self
     {
-        if (!$this->studio->contains($studio)) {
-            $this->studio[] = $studio;
-            $studio->setCoach($this);
+        if (!$this->video->contains($video)) {
+            $this->video[] = $video;
+            $video->setCoach($this);
         }
 
         return $this;
     }
 
-    public function removeStudio(Studio $studio): self
+    public function removeVideo(Video $video): self
     {
-        if ($this->studio->removeElement($studio)) {
+        if ($this->video->removeElement($video)) {
             // set the owning side to null (unless already changed)
-            if ($studio->getCoach() === $this) {
-                $studio->setCoach(null);
+            if ($video->getCoach() === $this) {
+                $video->setCoach(null);
             }
         }
 
         return $this;
     }
+
+
 }

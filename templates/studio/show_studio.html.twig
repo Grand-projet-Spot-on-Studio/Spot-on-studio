@@ -1,7 +1,39 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<h1>{{ studio.name }}</h1>
-
+<h1>Votre Studio {{ studio.name }}</h1>
+    {% for media in studio.media %}
+        {% if media.name == 'picture' %}
+            <img src="{{ asset ('studio/') }}{{ media.url }}" alt="{{ media.name }}">
+        {% endif %}
+    {% endfor %}
+    <a href="{{ path('insert_coach', {'id' : studio.id }) }}">créer votre coach</a>
+    <a href="{{ path('insert_video', {'id' : studio.id}) }}">créer votre video</a>
+    <br>
+    <span>vos video</span>
+    {% for video in videos %}
+        <div>
+            {{ video.title }}
+            {% if video.coach.name is defined %}
+                <span>{{ video.coach.name }}</span><br>
+            {% endif %}
+            {% for media in video.media %}
+                {% if media.name == 'picture' %}
+                    <img src="{{ asset ('video/') }}{{ media.url }}" alt="{{ media.name }}">
+                {% endif %}
+            {% endfor %}
+            <span>{{ video.numberView }}</span><br>
+            <span>{{ video.difficulty }}</span><br>
+            <span>{{ video.duration }}</span><br>
+            <span>date de creation de la video : {{ video.createdAt|date("d/m/Y") }}</span>
+            <span>date de publication de la video : {{ video.programmingdate|date("d/m/Y")}} </span><br>
+            <span>votre video est : {{ video.status.name }}</span><br>
+            <a href="{{ path ('show_video' , {'id': video.id}) }}">La video</a>
+            <a href="{{ path('delete_video', {'id' : video.id}) }}">supprimer la vidéo</a>
+            <a href="{{ path('update_video', {'studio' : studio.id, 'id' : video.id}) }}">modifier la vidéo</a>
+            <a href="{{ path('media_video', {'id' : video.id})}}">gestion du flux d'image</a>
+        </div><br>
+    {% endfor %}
+    {{ knp_pagination_render(videos) }}
 
 {% endblock %}
