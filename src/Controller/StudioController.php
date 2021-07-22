@@ -176,14 +176,16 @@ class StudioController extends AbstractController
     {
         $studio = $studioRepository->find($id);
         $videos = $videoRepository->findBy(['studio' => $id]);
-
         $todayDay = new \DateTime('now');
+        //methode qui me permet de recuperer la date de publication qui est en base de donnée
         $dateDatabase = $videoRepository->datePublished();
-
         foreach ($videos as $video){
             $status = $video->getStatus();
-            ($todayDay == $dateDatabase) ? $status->setName('asPublished') : $status->setName('notPublished');;
+            ($todayDay >= $dateDatabase) ? $status->setName('asPublished') : $status->setName('notPublished');;
         }
+        $duration = $video->getDuration();
+        //methode qui permet de convertir les secondes en h:m:s
+        $video->setDuration($videoRepository->ConvertisseurTime($duration));
 
         $videos = $paginator->paginate(
             $videos, // Requête contenant les données à paginer (video)

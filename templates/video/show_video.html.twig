@@ -10,7 +10,7 @@
     {% endif %}
     <span>{{ video.difficulty }}</span>
     <a href="{{ path('delete_video', {'id' : video.id}) }}">supprimer la vidéo</a>
-    <a href="{{ path('update_video', {'id' : video.id}) }}">modifier la vidéo</a>
+{#    <a href="{{ path('update_video', {'id' : video.id}) }}">modifier la vidéo</a>#}
     <a href="{{ path('media_video', {'id' : video.id})}}">gestion du flux d'image</a>
 
 {% endblock %}

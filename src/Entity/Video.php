@@ -31,7 +31,7 @@ class Video
     private ?string $description;
 
     /**
-     * @ORM\Column(type="time", nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $duration;
 
@@ -136,12 +136,12 @@ class Video
         return $this;
     }
 
-    public function getDuration(): ?\DateTimeInterface
+    public function getDuration()
     {
         return $this->duration;
     }
 
-    public function setDuration(?\DateTimeInterface $duration): self
+    public function setDuration($duration): self
     {
         $this->duration = $duration;
 

@@ -15,9 +15,13 @@ use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 
 class VideoController extends AbstractController
@@ -30,7 +34,7 @@ class VideoController extends AbstractController
     {
         $videos = $videoRepository->findAll();
 
-        return $this->render('video/video.html.twig',[
+        return $this->render('video/show_video.html.twig',[
             'videos'=>$videos
         ]);
     }
@@ -38,17 +42,22 @@ class VideoController extends AbstractController
     /**
      * @Route ("/insert/video/{id}", name="insert_video")
      */
-    public function insertVideo ($id, EntityManagerInterface $entityManager, Request $request, StudioRepository $studioRepository)
+    public function insertVideo ($id,
+                                 EntityManagerInterface $entityManager,
+                                 Request $request,
+                                 StudioRepository $studioRepository
+                                )
     {
         $video = new Video();
         $studio = $studioRepository->find($id);
+
 
         $form = $this->createForm(VideoType::class, $video);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-            $video = $form->getData();
 
+            $video = $form->getData();
 
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()){
@@ -87,7 +96,6 @@ class VideoController extends AbstractController
                 }
 
             }
-
             $video->setStudio($studio);
             $entityManager->persist($video);
             $entityManager->flush();
@@ -109,10 +117,13 @@ class VideoController extends AbstractController
                                 $id,
                                 $studio,
                                 Request $request,
-                                EntityManagerInterface $entityManager)
+                                EntityManagerInterface $entityManager,
+                                MediaRepository $mediaRepository
+    )
     {
         $video = $videoRepository->find($id);
         $studio = $studioRepository->find($studio);
+        $media = $mediaRepository->findOneBy(['video'=>$id]);
 
         $form = $this->createForm(VideoType::class, $video);
 
@@ -122,6 +133,17 @@ class VideoController extends AbstractController
             $video = $form->getData();
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()) {
+                // @TODO verifier si les fichier se supprime lors d'un update du flux video
+                $filesystem = new Filesystem();
+                //je recupere le nom du fichcier du flux d'image
+                $filesNameVideo = $media->getUrl();
+                //je dis a symfony qu'il doit aller dans un dossier
+                $projectDir = $this->getParameter('kernel.project_dir');
+                //je lui indique la route ou il doit aller chercher le fichier
+                $webPath = $projectDir . '\public\video\\';
+                //je supprimme le fichier
+                $filesystem->remove($webPath . $filesNameVideo);
+
                 //pour changer en base de donné le 0 ou 1
                 $status = $form['status']->getData();
                 ($status == 1) ? $status = 'notPublished' : $status = 'asPublished';
@@ -173,9 +195,29 @@ class VideoController extends AbstractController
      * @Route ("/delete/video/{id}", name="delete_video")
      */
 
-    public Function deleteVideo(VideoRepository $videoRepository, $id, EntityManagerInterface $entityManager)
+    public Function deleteVideo(VideoRepository $videoRepository,
+                                $id,
+                                EntityManagerInterface $entityManager,
+                                MediaRepository $mediaRepository
+                                )
     {
+        $filesystem = new Filesystem();
         $video = $videoRepository->find($id);
+        $media = $mediaRepository->findOneBy(['video'=>$id]);
+
+        ///////////////////////////////////logique pour supprimer les fichiers dans le dossier public//////////////////////////////
+        //je recupere la miniature de la video
+        $filesNamePicture = $media->getName();
+        //je recupere le nom du fichcier du flux d'image
+        $filesNameVideo = $media->getUrl();
+        //je dis a symfony qu'il doit aller dans un dossier
+        $projectDir = $this->getParameter('kernel.project_dir');
+        //je lui indique la route ou il doit aller chercher le fichier
+        $webPath = $projectDir . '\public\video\\';
+        //je supprimme le fichier
+        $filesystem->remove($webPath . $filesNameVideo);
+        $filesystem->remove($webPath . $filesNamePicture);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $entityManager->remove((object)$video);
         $entityManager->flush();

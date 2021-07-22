@@ -22,16 +22,17 @@ class MediaController extends AbstractController
      */
     public function insertMediaVideo(
         EntityManagerInterface $entityManager,
-        MediaRepository $mediaRepository,
         VideoRepository $videoRepository,
         $id,
         Request $request
+
     )
     {
-
         $media = new Media();
+        //class php qui me permet  d'analyser les fichiers téléchargé
+        //composer require james-heinrich/getid3
+        $getId3 = new \getID3();
         $video = $videoRepository->find($id);
-
 
         $form = $this->createForm(MediaType::class, $media);
 
@@ -57,6 +58,12 @@ class MediaController extends AbstractController
             $media->setName('video');
             $media->setUrl($newfiles);
             $entityManager->persist($media);
+            //j'analyse le fichier et getid3 me sort un tableau avec toutes les données
+            $file = $getId3->analyze('video/'.$media->getUrl());
+            //je recupere le temps de la video qui est l'index playtime
+            $duration = $file['playtime_seconds'];
+            //je le mets dans l'attribut duration de mon entité vidéo
+            $video->setDuration($duration);
             $entityManager->flush();
             return $this->redirectToRoute('show_video',[
                 'id'=>$id,
@@ -82,9 +89,8 @@ class MediaController extends AbstractController
     )
     {
         $media = new Media;
+        $getId3 = new \getID3();
         $video = $videoRepository->find($id);
-
-
 
         $form = $this->createForm(MediaType::class, $media);
 
@@ -111,6 +117,11 @@ class MediaController extends AbstractController
             $media->setName('video');
             $media->setUrl($newfiles);
             $entityManager->persist($media);
+            $file = $getId3->analyze('video/'.$media->getUrl());
+            //je recupere le temps de la video qui est l'index playtime
+            $duration = $file['playtime_seconds'];
+            //je le mets dans l'attribut duration de mon entité vidéo
+            $video->setDuration($duration);
             $entityManager->flush();
             return $this->redirectToRoute('show_video',[
                 'id'=>$id,
