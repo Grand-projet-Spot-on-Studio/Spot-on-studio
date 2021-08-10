@@ -3,6 +3,7 @@
 {% block body  %}
 
     {% for studio in studios %}
+        {% set nameStudio = studio.name %}
         <div>
             <h1>{{ studio.name }}</h1>
             <p>{{ studio.adress }}</p>
@@ -10,6 +11,10 @@
             <p>{{ studio.zipcode }}</p>
             <p>{{ studio.city }}</p>
             <p>{{ studio.email }}</p>
+        </div>
+        <div>
+            <a href="{{ path('show_studio', {'name' : studio.slugName , 'id' : studio.id}) }}">voir le studio</a>
+            {{ dump(studio) }}
         </div>
     {% endfor %}
     {{ knp_pagination_render(studios) }}

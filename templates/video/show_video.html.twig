@@ -1,16 +1,22 @@
 {% extends ('base.html.twig') %}
 
 {% block body %}
+    {% set studio = video.studio %}
+    {% set media = video.media[0] %}
+
 
     <h1>{{ video.title }}</h1>
     <p>{{ video.description }}</p>
     {% if video.media is not empty %}
-        <img src="{{ asset('video/') }}{{ video.media[0].url }}" alt="">
-        <video controls><source src="{{ asset('video/') }}{{ video.media[1].url }}"></video>
+        {{ dump(video) }}
+        {% for media in video.media %}
+            <img src="{{ asset('video/') }}{{ video.media[0].url }}" alt="">
+            <video controls><source src="{{ asset('video/') }}{{ media.url }}"></video>
+        {% endfor %}
     {% endif %}
     <span>{{ video.difficulty }}</span>
     <a href="{{ path('delete_video', {'id' : video.id}) }}">supprimer la vidéo</a>
-{#    <a href="{{ path('update_video', {'id' : video.id}) }}">modifier la vidéo</a>#}
-    <a href="{{ path('media_video', {'id' : video.id})}}">gestion du flux d'image</a>
+    <a href="{{ path('update_video', {'studio' : studio.id, 'id' : video.id}) }}">modifier la vidéo</a>
+    <a href="{{ path('update_media_video', {'fluxMedia' : media.id , 'id' : video.id})}}">gestion du flux d'image</a>
 
 {% endblock %}

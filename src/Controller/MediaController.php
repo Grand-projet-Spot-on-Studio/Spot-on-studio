@@ -10,6 +10,7 @@ use App\Repository\MediaRepository;
 use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -78,25 +79,37 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @Route("update/media/video/{id}", name="update_media_video")
+     * @Route("update/media/video/{fluxMedia}/{id}", name="update_media_video")
      */
     public function updateMediaVideo(
         EntityManagerInterface $entityManager,
         MediaRepository $mediaRepository,
         VideoRepository $videoRepository,
         $id,
+        $fluxMedia,
         Request $request
     )
     {
-        $media = new Media;
-        $getId3 = new \getID3();
         $video = $videoRepository->find($id);
+        $media = $mediaRepository->find($fluxMedia);
+        $filesystem = new Filesystem();
+        $getId3 = new \getID3();
 
         $form = $this->createForm(MediaType::class, $media);
-
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
+
+            //je recupere le nom du fichier du flux d'image
+            $filesNameVideo = $media->getUrl();
+            //je dis a symfony qu'il doit aller dans un dossier
+            $projectDir = $this->getParameter('kernel.project_dir');
+            //je lui indique la route ou il doit aller chercher le fichier
+            $webPath = $projectDir . '\public\video\\';
+            //je supprimme le fichier
+            $filesystem->remove($webPath . $filesNameVideo);
+
+
             $newMedia = $form['url']->getData();
 
             $newfiles = md5(uniqid()) . '.' . $newMedia->guessExtension();
@@ -122,15 +135,19 @@ class MediaController extends AbstractController
             $duration = $file['playtime_seconds'];
             //je le mets dans l'attribut duration de mon entité vidéo
             $video->setDuration($duration);
+
             $entityManager->flush();
             return $this->redirectToRoute('show_video',[
                 'id'=>$id,
                 'video'=>$video
+
             ]);
 
         }
+
         return $this->render('video/insert_update_image_stream.html.twig',[
-            'media' => $form->createView()
+            'media' => $form->createView(),
+            'video'=>$video
         ]);
     }
 

@@ -123,7 +123,6 @@ class VideoController extends AbstractController
     {
         $video = $videoRepository->find($id);
         $studio = $studioRepository->find($studio);
-        $media = $mediaRepository->findOneBy(['video'=>$id]);
 
         $form = $this->createForm(VideoType::class, $video);
 
@@ -133,16 +132,6 @@ class VideoController extends AbstractController
             $video = $form->getData();
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()) {
-                // @TODO verifier si les fichier se supprime lors d'un update du flux video
-                $filesystem = new Filesystem();
-                //je recupere le nom du fichcier du flux d'image
-                $filesNameVideo = $media->getUrl();
-                //je dis a symfony qu'il doit aller dans un dossier
-                $projectDir = $this->getParameter('kernel.project_dir');
-                //je lui indique la route ou il doit aller chercher le fichier
-                $webPath = $projectDir . '\public\video\\';
-                //je supprimme le fichier
-                $filesystem->remove($webPath . $filesNameVideo);
 
                 //pour changer en base de donné le 0 ou 1
                 $status = $form['status']->getData();
@@ -233,7 +222,7 @@ class VideoController extends AbstractController
      */
     public function showVideo(VideoRepository $videoRepository, $id)
     {
-        $video = $videoRepository->find($id);
+       $video = $videoRepository->find($id);
 
         return $this->render('video/show_video.html.twig', [
             'video'=>$video

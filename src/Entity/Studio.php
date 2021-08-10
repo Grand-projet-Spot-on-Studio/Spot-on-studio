@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * @ORM\Entity(repositoryClass=StudioRepository::class)
@@ -84,13 +85,23 @@ class Studio
      */
     private $video;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $slugName;
 
-    public function __construct()
+
+
+
+
+
+    public function __construct(SluggerInterface $slugger)
     {
         $this->user_customer = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->coach = new ArrayCollection();
         $this->video = new ArrayCollection();
+        $this->slugger = $slugger;
     }
 
     public function getId(): ?int
@@ -302,6 +313,34 @@ class Studio
         }
 
         return $this;
+    }
+
+    public function getSlugName(): ?string
+    {
+        return $this->slugName;
+    }
+
+    public function setSlugName(?string $slugName): self
+    {
+        $this->slugName = $slugName;
+
+        return $this;
+    }
+
+    /**
+     * @return SluggerInterface
+     */
+    public function getSlugger(): SluggerInterface
+    {
+        return $this->slugger;
+    }
+
+    /**
+     * @param SluggerInterface $slugger
+     */
+    public function setSlugger(SluggerInterface $slugger): void
+    {
+        $this->slugger = $slugger;
     }
 
 

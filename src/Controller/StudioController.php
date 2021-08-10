@@ -16,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\TimeConverteur\TimeConverteur;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class StudioController extends AbstractController
 {
@@ -25,6 +27,7 @@ class StudioController extends AbstractController
     public function displayStudio(StudioRepository $repository, PaginatorInterface $paginator, Request $request)
     {
         $studios = $repository->findAll();
+
         $studios = $paginator->paginate(
             $studios, // Requête contenant les données à paginer
             $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
@@ -34,60 +37,60 @@ class StudioController extends AbstractController
             'studios' => $studios
         ]);
     }
-
-    /**
-     * @Route ("/insert/studio", name="insert_studio")
-     */
-
-    public function insertStudio(EntityManagerInterface $entityManager, Request $request)
-    {
-        $studio = new Studio();
-
-        $form = $this->createForm(StudioType::class, $studio);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $studio = $form->getData();
-            //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
-            $media = $form->get('media')->getData();
-            if(!empty($media)){
-                $newfiles = md5(uniqid()) . '.' . $media->guessExtension();
-                try {
-                    $media->move(
-                        $this->getParameter('studio_directory'),
-                        $newfiles
-                    );
-
-                } catch (FileException $e) {
-
-                    throw new \Exception("le studio n\'a pas été enregistré");
-
-                }
-                $media = new Media();
-                //dans l'entité media le champ url est remplie par le nom qui est dans $newfile
-                $media->setUrl($newfiles)
-                    //le nom de mon media
-                    ->setName('picture');
-
-                $studio->addMedia($studio);
-
-                $entityManager->persist($media);
-            }
-
-            $entityManager->persist($studio);
-            $entityManager->flush();
-            $this->addFlash('success',
-                'le studio a été créé'
-            );
-
-            return $this->redirectToRoute('display_studio');
-        }
-        return $this->render('studio/insert_update_studio.html.twig', [
-            'studio' => $form->createView()
-        ]);
-    }
+//
+//    /**
+//     * @Route ("/insert/studio", name="insert_studio")
+//     */
+//
+//    public function insertStudio(EntityManagerInterface $entityManager, Request $request)
+//    {
+//        $studio = new Studio();
+//
+//        $form = $this->createForm(StudioType::class, $studio);
+//
+//        $form->handleRequest($request);
+//
+//        if ($form->isSubmitted() && $form->isValid()) {
+//
+//            $studio = $form->getData();
+//            //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
+//            $media = $form->get('media')->getData();
+//            if(!empty($media)){
+//                $newfiles = md5(uniqid()) . '.' . $media->guessExtension();
+//                try {
+//                    $media->move(
+//                        $this->getParameter('studio_directory'),
+//                        $newfiles
+//                    );
+//
+//                } catch (FileException $e) {
+//
+//                    throw new \Exception("le studio n\'a pas été enregistré");
+//
+//                }
+//                $media = new Media();
+//                //dans l'entité media le champ url est remplie par le nom qui est dans $newfile
+//                $media->setUrl($newfiles)
+//                    //le nom de mon media
+//                    ->setName('picture');
+//
+//                $studio->addMedia($studio);
+//
+//                $entityManager->persist($media);
+//            }
+//
+//            $entityManager->persist($studio);
+//            $entityManager->flush();
+//            $this->addFlash('success',
+//                'le studio a été créé'
+//            );
+//
+//            return $this->redirectToRoute('display_studio');
+//        }
+//        return $this->render('studio/insert_update_studio.html.twig', [
+//            'studio' => $form->createView()
+//        ]);
+//    }
 
     /**
      * @Route("/update/studio/{id}", name="update_studio")
@@ -95,14 +98,17 @@ class StudioController extends AbstractController
     public function updateVideo(StudioRepository $studioRepository, $id, Request $request, EntityManagerInterface $entityManager)
     {
         $studio = $studioRepository->find($id);
-
         $form = $this->createForm(StudioType::class, $studio);
-
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
-
             $studio = $form->getData();
+            //////////////////////////////////////////////////
+            $slugger = new AsciiSlugger();
+            $nameSlug = $form->get('name')->getData();
+            $slug = $slugger->slug($nameSlug);
+            $studio->setSlugName($slug);
+            //////////////////////////////////////////////////
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             $media = $form->get('media')->getData();
             if(!empty($media)){
@@ -125,12 +131,8 @@ class StudioController extends AbstractController
                     ->setName('picture');
 
                 $studio->addMedia($media);
-
                 $entityManager->persist($media);
-
             }
-
-
             $entityManager->persist($studio);
             $entityManager->flush();
             $this->addFlash('success',
@@ -164,14 +166,14 @@ class StudioController extends AbstractController
     }
 
     /**
-     * @Route("/show/studio/{id}", name="show_studio")
+     * @Route("/show/studio/{name}/{id}", name="show_studio")
      */
     public function showStudio(StudioRepository $studioRepository,
                                $id,
                                VideoRepository $videoRepository,
                                PaginatorInterface $paginator,
                                Request $request,
-                                StatusRepository $statusRepository
+                               TimeConverteur $timeConverteur
     )
     {
         $studio = $studioRepository->find($id);
@@ -185,8 +187,7 @@ class StudioController extends AbstractController
         }
         $duration = $video->getDuration();
         //methode qui permet de convertir les secondes en h:m:s
-        $video->setDuration($videoRepository->ConvertisseurTime($duration));
-
+        $video->setDuration($timeConverteur->ConvertisseurTime($duration));
         $videos = $paginator->paginate(
             $videos, // Requête contenant les données à paginer (video)
             $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
