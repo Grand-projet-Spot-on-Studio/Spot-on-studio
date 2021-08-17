@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body  %}
+
+    {% for video in videos %}
+        <div>
+            <h1>{{ video.name }}</h1>
+            <p>{{ video.adress }}</p>
+            <p>{{ video.phone }}</p>
+            <p>{{ video.zipcode }}</p>
+            <p>{{ video.city }}</p>
+            <p>{{ video.email }}</p>
+        </div>
+        <div>
+            <a href="{{ path('show_video', {'id' : video.id}) }}">voir le video</a>
+            {{ dump(video) }}
+        </div>
+    {% endfor %}
+
+
+{% endblock %}

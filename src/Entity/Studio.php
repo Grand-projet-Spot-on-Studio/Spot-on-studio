@@ -75,10 +75,6 @@ class Studio
      */
     private $status;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Coach::class, mappedBy="studio")
-     */
-    private $coach;
 
     /**
      * @ORM\OneToMany(targetEntity=Video::class, mappedBy="studio")
@@ -90,18 +86,19 @@ class Studio
      */
     private $slugName;
 
-
-
-
+    /**
+     * @ORM\ManyToMany(targetEntity=Coach::class, mappedBy="studio")
+     */
+    private $coaches;
 
 
     public function __construct(SluggerInterface $slugger)
     {
         $this->user_customer = new ArrayCollection();
         $this->media = new ArrayCollection();
-        $this->coach = new ArrayCollection();
         $this->video = new ArrayCollection();
         $this->slugger = $slugger;
+        $this->coaches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -262,29 +259,6 @@ class Studio
     }
 
 
-
-    public function addCoach(Coach $coach): self
-    {
-        if (!$this->coach->contains($coach)) {
-            $this->coach[] = $coach;
-            $coach->setStudio($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCoach(Coach $coach): self
-    {
-        if ($this->coach->removeElement($coach)) {
-            // set the owning side to null (unless already changed)
-            if ($coach->getStudio() === $this) {
-                $coach->setStudio(null);
-            }
-        }
-
-        return $this;
-    }
-
     /**
      * @return Collection|Video[]
      */
@@ -341,6 +315,33 @@ class Studio
     public function setSlugger(SluggerInterface $slugger): void
     {
         $this->slugger = $slugger;
+    }
+
+    /**
+     * @return Collection|Coach[]
+     */
+    public function getCoaches(): Collection
+    {
+        return $this->coaches;
+    }
+
+    public function addCoach(Coach $coach): self
+    {
+        if (!$this->coaches->contains($coach)) {
+            $this->coaches[] = $coach;
+            $coach->addStudio($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCoach(Coach $coach): self
+    {
+        if ($this->coaches->removeElement($coach)) {
+            $coach->removeStudio($this);
+        }
+
+        return $this;
     }
 
 

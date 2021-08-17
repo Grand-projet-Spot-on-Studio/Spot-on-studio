@@ -33,11 +33,11 @@ class VideoType extends AbstractType
             ])
             ->add('average_grade')
             //demander si la video doit etre plublie ou pas
-            ->add('status', CheckboxType::class,[
+            ->add('status', EntityType::class,[
                 'label' => 'veuillez cocher si la vidéo doit être publié plus tard',
-                'data_class' => Status::class,
-                'mapped' => false,
-                'required' => false
+                'class' => Status::class,
+                'choice_label' => 'name'
+
             ])
             //choisir le coach qui a fait la video
             ->add('coach', EntityType::class, [

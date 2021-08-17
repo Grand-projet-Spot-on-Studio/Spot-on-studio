@@ -12,6 +12,7 @@ use App\Repository\MediaRepository;
 use App\Repository\StatusRepository;
 use App\Repository\StudioRepository;
 use App\Repository\VideoRepository;
+use App\TimeConverteur\TimeConverteur;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,14 +28,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class VideoController extends AbstractController
 {
     /**
-     * @Route ("display/video", name="display_video")
+     * @Route ("display/video/{id}", name="display_video")
      */
 
-    public function displayVideo(VideoRepository $videoRepository)
+    public function displayVideo(VideoRepository $videoRepository, StudioRepository $studioRepository, $id)
     {
-        $videos = $videoRepository->findAll();
+        $studio = $studioRepository->find($id);
+        $videos = $videoRepository->findBy(['studio'=>$studio]);
 
-        return $this->render('video/show_video.html.twig',[
+        return $this->render('video/display_video.html.twig',[
             'videos'=>$videos
         ]);
     }
@@ -45,7 +47,8 @@ class VideoController extends AbstractController
     public function insertVideo ($id,
                                  EntityManagerInterface $entityManager,
                                  Request $request,
-                                 StudioRepository $studioRepository
+                                 StudioRepository $studioRepository,
+                                StatusRepository $statusRepository
                                 )
     {
         $video = new Video();
@@ -62,14 +65,8 @@ class VideoController extends AbstractController
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()){
 
-                //pour changer en base de donné le 0 ou 1
                 $status = $form['status']->getData();
-                ($status == 1) ? $status = 'notPublished' : $status = 'asPublished';
-                $dataStatus = new Status();
-                $dataStatus->setName($status);
-                $dataStatus->addVideo($video);
-                $entityManager->persist($dataStatus);
-
+                $video->setStatus($status);
                 $coach = $form['coach']->getData();
                 $video->setCoach($coach);
 
@@ -102,7 +99,7 @@ class VideoController extends AbstractController
             $this->addFlash('success',
                 'le cours a été créé'
             );
-            return $this->redirectToRoute('show_studio', ['id'=>$studio->getid()]);
+            return $this->redirectToRoute('show_video', ['id'=>$video->getId()]);
         }
         return $this->render('video/insert_update_video.html.twig',[
                 'video' => $form->createView()
@@ -133,13 +130,8 @@ class VideoController extends AbstractController
             //je recupere le formulaire de media pour pouvoir completer les données dans l'entité media
             if($form->isSubmitted() && $form->isValid()) {
 
-                //pour changer en base de donné le 0 ou 1
                 $status = $form['status']->getData();
-                ($status == 1) ? $status = 'notPublished' : $status = 'asPublished';
-                $dataStatus = new Status();
-                $dataStatus->setName($status);
-                $dataStatus->addVideo($video);
-                $entityManager->persist($dataStatus);
+                $video->setStatus($status);
 
                 $coach = $form['coach']->getData();
                 $video->setCoach($coach);
@@ -173,7 +165,7 @@ class VideoController extends AbstractController
                 'le cours a été créé'
             );
 
-            return $this->redirectToRoute('show_studio', ['id'=>$studio->getid()]);
+            return $this->redirectToRoute('show_video', ['id'=>$video->getId()]);
         }
         return $this->render('video/insert_update_video.html.twig',[
             'video' => $form->createView()
@@ -214,18 +206,34 @@ class VideoController extends AbstractController
         $this->addFlash(
             'success', 'La video a été bien suppirmé'
         );
-        return $this->redirectToRoute('display_video');
+        return $this->redirectToRoute('home');
     }
 
     /**
      * @Route("/show/video/{id}", name="show_video")
      */
-    public function showVideo(VideoRepository $videoRepository, $id)
+    public function showVideo(VideoRepository $videoRepository,
+                              $id,
+                              TimeConverteur $timeConverteur,
+                              $nameStudio,
+                              StudioRepository $studioRepository)
     {
        $video = $videoRepository->find($id);
+       $duration = $video->getDuration();
+       $timeMedia = $timeConverteur->ConvertisseurTime($duration);
 
-        return $this->render('video/show_video.html.twig', [
-            'video'=>$video
+        $statusDataBase= $video->getStatus()->getName();
+        $datePublished = $video->getProgrammingDate();
+        $dateCreated = $video->getcreatedAt();
+       if($statusDataBase == 'published' && $datePublished <= $dateCreated){
+            $status = 'published';
+       }else{
+           $status = 'notPublished';
+       }
+       return $this->render('video/show_video.html.twig', [
+            'video'=>$video,
+            'timeVideo'=>$timeMedia,
+            'status'=>$status
         ]);
     }
 

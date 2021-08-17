@@ -7,7 +7,6 @@ namespace App\Controller;
 use App\Entity\Coach;
 use App\Form\CoachType;
 use App\Entity\Media;
-use App\Form\StudioType;
 use App\Repository\CoachRepository;
 use App\Repository\StudioRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,16 +21,17 @@ class CoachController extends AbstractController
     /**
      * @Route ("/display/coach", name="display_coach")
      */
-    public function displayCoach(CoachRepository $repository)
+    public function displayCoach(CoachRepository $coachRepository)
     {
-        $coach = $repository->findAll();
+        $coach = $coachRepository->findAll();
+
         return $this->render('coach/display.coach.html.twig', [
             'coaches' => $coach
         ]);
     }
 
     /**
-     * @Route ("/insert/coach/{id}", name="insert_coach")
+     * @Route ("/insert/coach", name="insert_coach")
      */
 
     public function insertCoach($id, EntityManagerInterface $entityManager, Request $request, StudioRepository $studioRepository)
@@ -40,9 +40,7 @@ class CoachController extends AbstractController
         $studio = $studioRepository->find($id);
 
         $form = $this->createForm(CoachType::class, $coach);
-
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
 
             $coach = $form->getData();

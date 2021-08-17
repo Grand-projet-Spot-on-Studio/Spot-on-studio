@@ -35,16 +35,16 @@ class Coach
      */
     private $media;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Studio::class, inversedBy="coach")
-     * @JoinColumn(onDelete="CASCADE")
-     */
-    private $studio;
 
     /**
      * @ORM\OneToMany(targetEntity=Video::class, mappedBy="coach")
      */
     private $video;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Studio::class, inversedBy="coaches")
+     */
+    private $studio;
 
     public function __construct()
     {
@@ -93,17 +93,6 @@ class Coach
         return $this;
     }
 
-    public function getStudio(): ArrayCollection
-    {
-        return $this->studio;
-    }
-
-    public function setStudio(?Studio $studio): self
-    {
-        $this->studio = $studio;
-
-        return $this;
-    }
 
     /**
      * @return Collection|Video[]
@@ -131,6 +120,30 @@ class Coach
                 $video->setCoach(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Studio[]
+     */
+    public function getStudio(): Collection
+    {
+        return $this->studio;
+    }
+
+    public function addStudio(Studio $studio): self
+    {
+        if (!$this->studio->contains($studio)) {
+            $this->studio[] = $studio;
+        }
+
+        return $this;
+    }
+
+    public function removeStudio(Studio $studio): self
+    {
+        $this->studio->removeElement($studio);
 
         return $this;
     }

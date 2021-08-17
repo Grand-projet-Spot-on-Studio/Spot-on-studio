@@ -4,19 +4,24 @@
     {% set studio = video.studio %}
     {% set media = video.media[0] %}
 
-
     <h1>{{ video.title }}</h1>
     <p>{{ video.description }}</p>
+    <p>temps de la video : {{ timeVideo}}</p>
+    <p>{{ video.numberView }}</p>
+    <p>{{ video.difficulty }}</p>
+    <p>{{ video.createdAt | date("d/m/Y") }}</p>
+    <p>{{ status }}</p>
+
     {% if video.media is not empty %}
-        {{ dump(video) }}
         {% for media in video.media %}
-            <img src="{{ asset('video/') }}{{ video.media[0].url }}" alt="">
+            <div style = "width:200px; height : 200px">
+                <img style="width: 100%; height: auto" src="{{ asset('video/') }}{{ video.media[0].url }}" alt="miniature de la video {{ video.title }}">
+            </div>
             <video controls><source src="{{ asset('video/') }}{{ media.url }}"></video>
         {% endfor %}
     {% endif %}
-    <span>{{ video.difficulty }}</span>
+
     <a href="{{ path('delete_video', {'id' : video.id}) }}">supprimer la vidéo</a>
     <a href="{{ path('update_video', {'studio' : studio.id, 'id' : video.id}) }}">modifier la vidéo</a>
     <a href="{{ path('update_media_video', {'fluxMedia' : media.id , 'id' : video.id})}}">gestion du flux d'image</a>
-
 {% endblock %}
