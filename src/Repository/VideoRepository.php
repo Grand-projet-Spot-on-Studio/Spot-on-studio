@@ -19,26 +19,19 @@ class VideoRepository extends ServiceEntityRepository
         parent::__construct($registry, Video::class);
     }
 
-    public function datePublished()
+
+    public function videoByStudio($slug, $id)
     {
         return $this->createQueryBuilder('v')
-            ->Select('v.programmingDate')
+            ->select('v')
+            ->leftJoin('v.studio','s')
+            //attention la syntaxe doit etre comme celle ci dans le where dans espace =:
+            ->where('s.slugName=:slug')
+            ->setParameter('slug', $slug)
+            ->andWhere('v.id=:id')
+            ->setParameter('id', $id)
             ->getQuery()
             ->getResult();
     }
-
-
-
-
-//    //requete pour recuperer a la vue que les status
-//    public function statusPublished()
-//    {
-//        return $this->createQueryBuilder('v')
-//            ->select('v')
-//            ->leftJoin('v.status','s')
-//            ->addSelect('s.name')
-//            ->getQuery()
-//            ->getResult();
-//    }
 
 }

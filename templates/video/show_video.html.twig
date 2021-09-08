@@ -1,16 +1,20 @@
 {% extends ('base.html.twig') %}
 
 {% block body %}
-    {% set studio = video.studio %}
-    {% set media = video.media[0] %}
+    {% set media = video.media %}
 
     <h1>{{ video.title }}</h1>
     <p>{{ video.description }}</p>
+    {% if timeVideo is defined %}
     <p>temps de la video : {{ timeVideo}}</p>
+    {% endif %}
     <p>{{ video.numberView }}</p>
     <p>{{ video.difficulty }}</p>
     <p>{{ video.createdAt | date("d/m/Y") }}</p>
-    <p>{{ status }}</p>
+    {% if status is defined %}
+        <p>{{ status }}</p>
+    {% endif %}
+
 
     {% if video.media is not empty %}
         {% for media in video.media %}
@@ -23,5 +27,5 @@
 
     <a href="{{ path('delete_video', {'id' : video.id}) }}">supprimer la vidéo</a>
     <a href="{{ path('update_video', {'studio' : studio.id, 'id' : video.id}) }}">modifier la vidéo</a>
-    <a href="{{ path('update_media_video', {'fluxMedia' : media.id , 'id' : video.id})}}">gestion du flux d'image</a>
+    <a href="{{ path('media_video', {'name' : studio.slugName, 'id' : video.id})}}">gestion du flux d'image</a>
 {% endblock %}

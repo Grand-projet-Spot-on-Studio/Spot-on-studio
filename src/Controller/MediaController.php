@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Media;
 use App\Form\MediaType;
 use App\Repository\MediaRepository;
+use App\Repository\StudioRepository;
 use App\Repository\VideoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,22 +20,25 @@ use Symfony\Component\Routing\Annotation\Route;
 class MediaController extends AbstractController
 {
     /**
-     * @Route("/media/video/{id}", name="media_video")
+     * @Route("/media/video/{name}/{id}", name="media_video")
      */
     public function insertMediaVideo(
         EntityManagerInterface $entityManager,
         VideoRepository $videoRepository,
         $id,
-        Request $request
+        $name,
+        Request $request,
+        StudioRepository $studioRepository
 
     )
     {
+        $studioArray = $studioRepository->selectByStudio($name);
+        $studio = $studioArray[ '0'];
         $media = new Media();
         //class php qui me permet  d'analyser les fichiers téléchargé
         //composer require james-heinrich/getid3
         $getId3 = new \getID3();
         $video = $videoRepository->find($id);
-
         $form = $this->createForm(MediaType::class, $media);
 
         $form->handleRequest($request);
@@ -67,6 +71,7 @@ class MediaController extends AbstractController
             $video->setDuration($duration);
             $entityManager->flush();
             return $this->redirectToRoute('show_video',[
+                'name'=>$studio->getSlugName(),
                 'id'=>$id,
 
             ]);
@@ -74,7 +79,8 @@ class MediaController extends AbstractController
         }
         return $this->render('video/insert_update_image_stream.html.twig',[
             'media' => $form->createView(),
-            'video'=>$video
+            'video'=>$video,
+            'studio'=>$studio
         ]);
     }
 

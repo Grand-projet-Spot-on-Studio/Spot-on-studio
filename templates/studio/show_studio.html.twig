@@ -10,6 +10,7 @@
     <a href="{{ path('insert_coach', {'id' : studio.id }) }}">créer votre coach</a>
     <a href="{{ path('insert_video', {'id' : studio.id}) }}">créer votre video</a>
     <br>
+    {% if videos is defined %}
     <span>vos video</span>
     {% for video in videos %}
         <div>
@@ -35,5 +36,6 @@
         </div><br>
     {% endfor %}
     {{ knp_pagination_render(videos) }}
+    {% endif %}
 
 {% endblock %}

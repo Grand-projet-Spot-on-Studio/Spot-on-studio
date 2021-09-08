@@ -92,12 +92,12 @@ class Studio
     private $coaches;
 
 
-    public function __construct(SluggerInterface $slugger)
+
+    public function __construct()
     {
         $this->user_customer = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->video = new ArrayCollection();
-        $this->slugger = $slugger;
         $this->coaches = new ArrayCollection();
     }
 

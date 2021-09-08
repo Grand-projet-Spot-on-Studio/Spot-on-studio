@@ -139,7 +139,7 @@ class StudioController extends AbstractController
                 'le studio a été modifié ou crée'
             );
 
-            return $this->redirectToRoute('show_studio', ['id'=>$studio->getid()]);
+            return $this->redirectToRoute('show_studio', ['name' => $studio->getSlugName(), 'id'=>$studio->getid()]);
         }
         return $this->render('studio/insert_update_studio.html.twig',[
             'studio' => $form->createView()
@@ -179,24 +179,33 @@ class StudioController extends AbstractController
         $studio = $studioRepository->find($id);
         $videos = $videoRepository->findBy(['studio' => $id]);
         $todayDay = new \DateTime('now');
-        //methode qui me permet de recuperer la date de publication qui est en base de donnée
-        $dateDatabase = $videoRepository->datePublished();
-        foreach ($videos as $video){
-            $status = $video->getStatus();
-            ($todayDay >= $dateDatabase) ? $status->setName('asPublished') : $status->setName('notPublished');;
+        if(!empty($video)){
+            //methode qui me permet de recuperer la date de publication qui est en base de donnée
+            $dateDatabase = $videoRepository->datePublished();
+            foreach ($videos as $video){
+                $status = $video->getStatus();
+                ($todayDay >= $dateDatabase) ? $status->setName('asPublished') : $status->setName('notPublished');;
+            }
+            $duration = $video->getDuration();
+            //methode qui permet de convertir les secondes en h:m:s
+            $video->setDuration($timeConverteur->ConvertisseurTime($duration));
+            $videos = $paginator->paginate(
+                $videos, // Requête contenant les données à paginer (video)
+                $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
+                5 // Nombre de résultats par page
+            );
+
+            return $this->render('studio/show_studio.html.twig',
+                [
+                    'videos'=> $videos,
+                    'studio' => $studio
+                ]);
+
         }
-        $duration = $video->getDuration();
-        //methode qui permet de convertir les secondes en h:m:s
-        $video->setDuration($timeConverteur->ConvertisseurTime($duration));
-        $videos = $paginator->paginate(
-            $videos, // Requête contenant les données à paginer (video)
-            $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
-            5 // Nombre de résultats par page
-        );
+
         return $this->render('studio/show_studio.html.twig',
             [
-                'videos'=> $videos,
-                'studio' => $studio,
+                'studio' => $studio
             ]);
     }
 

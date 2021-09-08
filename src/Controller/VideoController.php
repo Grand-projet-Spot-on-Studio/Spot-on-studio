@@ -99,7 +99,7 @@ class VideoController extends AbstractController
             $this->addFlash('success',
                 'le cours a été créé'
             );
-            return $this->redirectToRoute('show_video', ['id'=>$video->getId()]);
+            return $this->redirectToRoute('show_video', ['name'=>$studio->getSlugName(), 'id'=>$video->getId()]);
         }
         return $this->render('video/insert_update_video.html.twig',[
                 'video' => $form->createView()
@@ -210,31 +210,48 @@ class VideoController extends AbstractController
     }
 
     /**
-     * @Route("/show/video/{id}", name="show_video")
+     * @Route("/show/video/{name}/{id}", name="show_video")
      */
     public function showVideo(VideoRepository $videoRepository,
                               $id,
                               TimeConverteur $timeConverteur,
-                              $nameStudio,
-                              StudioRepository $studioRepository)
+                              $name)
     {
-       $video = $videoRepository->find($id);
-       $duration = $video->getDuration();
-       $timeMedia = $timeConverteur->ConvertisseurTime($duration);
 
-        $statusDataBase= $video->getStatus()->getName();
-        $datePublished = $video->getProgrammingDate();
-        $dateCreated = $video->getcreatedAt();
-       if($statusDataBase == 'published' && $datePublished <= $dateCreated){
-            $status = 'published';
-       }else{
-           $status = 'notPublished';
-       }
-       return $this->render('video/show_video.html.twig', [
+       $videos = $videoRepository->videoByStudio($name, $id);
+       $video = $videos['0'];
+
+
+        foreach($videos as $video) {
+            $studio = $video->getStudio();
+            $media  = $video->getMedia();
+            foreach ($video as $data){
+                $duration = $data->getDuration();
+            }
+        }
+        if(!empty($duration)){
+            $timeMedia = $timeConverteur->ConvertisseurTime($duration);
+            $statusDataBase= $video->getStatus()->getName();
+            $datePublished = $video->getProgrammingDate();
+            $dateCreated = $video->getcreatedAt();
+            if($statusDataBase == 'published' && $datePublished <= $dateCreated){
+                $status = 'published';
+            }else{
+                $status = 'notPublished';
+            }
+            return $this->render('video/show_video.html.twig', [
+                'video'=>$video,
+                'timeVideo'=>$timeMedia,
+                'status'=>$status
+            ]);
+        }
+
+        return $this->render('video/show_video.html.twig', [
             'video'=>$video,
-            'timeVideo'=>$timeMedia,
-            'status'=>$status
+            'studio'=>$studio,
+            'media'=>$media
         ]);
+
     }
 
 

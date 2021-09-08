@@ -19,6 +19,15 @@ class StudioRepository extends ServiceEntityRepository
         parent::__construct($registry, Studio::class);
     }
 
+    public function selectByStudio($slug){
+        return $this->createQueryBuilder('s')
+            ->select('s')
+            ->where('s.slugName=:slug')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    //requete pour recuperer a la vue que les video
 //    public function displayVideoPublished()
 //    {
