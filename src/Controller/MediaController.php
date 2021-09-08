@@ -33,7 +33,7 @@ class MediaController extends AbstractController
     )
     {
         $studioArray = $studioRepository->selectByStudio($name);
-        $studio = $studioArray[ '0'];
+        $studio = $studioArray['0'];
         $media = new Media();
         //class php qui me permet  d'analyser les fichiers téléchargé
         //composer require james-heinrich/getid3

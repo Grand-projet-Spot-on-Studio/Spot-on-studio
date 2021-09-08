@@ -25,17 +25,19 @@
             {% endfor %}
             <span>{{ video.numberView }}</span><br>
             <span>{{ video.difficulty }}</span><br>
-            <span>date de creation de la video : {{ video.createdAt|date("d/m/Y") }}</span>
+            {% if status == 'non publier' %}
             <span>date de publication de la video : {{ video.programmingdate|date("d/m/Y")}} </span><br>
-            <span>votre video est : {{ video.status.name }}</span><br>
+            {% endif %}
+            <span>date de creation de la video : {{ video.createdAt|date("d/m/Y") }}</span><br>
+            <span>votre video est : {{ status }}</span><br>
             <span>la duré de votre vidéo est de : {{ video.duration }}</span><br>
-            <a href="{{ path ('show_video' , {'id': video.id}) }}">La video</a>
+            <a href="{{ path ('show_video' , {'name': studio.slugName,'id': video.id}) }}">La video</a>
             <a href="{{ path('delete_video', {'id' : video.id}) }}">supprimer la vidéo</a>
             <a href="{{ path('update_video', {'studio' : studio.id, 'id' : video.id}) }}">modifier la vidéo</a>
-            <a href="{{ path('media_video', {'id' : video.id})}}">gestion du flux d'image</a>
+            <a href="{{ path('media_video', {'name' : studio.slugName, 'id' : video.id})}}">gestion du flux d'image</a>
         </div><br>
     {% endfor %}
-    {{ knp_pagination_render(videos) }}
+{#        {{ knp_pagination_render(videos) }}#}
     {% endif %}
 
 {% endblock %}

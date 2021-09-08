@@ -12,7 +12,7 @@ use App\Repository\MediaRepository;
 use App\Repository\StatusRepository;
 use App\Repository\StudioRepository;
 use App\Repository\VideoRepository;
-use App\TimeConverteur\TimeConverteur;
+use App\Service\TimeConverteur;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

@@ -16,8 +16,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use App\TimeConverteur\TimeConverteur;
+use App\Service\TimeConverteur;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use function Symfony\Component\String\s;
 
 class StudioController extends AbstractController
 {
@@ -169,6 +170,7 @@ class StudioController extends AbstractController
      * @Route("/show/studio/{name}/{id}", name="show_studio")
      */
     public function showStudio(StudioRepository $studioRepository,
+                               $name,
                                $id,
                                VideoRepository $videoRepository,
                                PaginatorInterface $paginator,
@@ -176,36 +178,42 @@ class StudioController extends AbstractController
                                TimeConverteur $timeConverteur
     )
     {
-        $studio = $studioRepository->find($id);
+        $studioArray = $studioRepository->selectByStudio($name);
+        $studio = $studioArray['0'];
         $videos = $videoRepository->findBy(['studio' => $id]);
         $todayDay = new \DateTime('now');
-        if(!empty($video)){
+        if(!empty($videos)){
             //methode qui me permet de recuperer la date de publication qui est en base de donnée
-            $dateDatabase = $videoRepository->datePublished();
             foreach ($videos as $video){
-                $status = $video->getStatus();
-                ($todayDay >= $dateDatabase) ? $status->setName('asPublished') : $status->setName('notPublished');;
+                $status = $video->getStatus()->getId();
+                $dateDatabase = $video->getProgrammingDate();
+                if($status == 1 && $dateDatabase >= $todayDay){
+                    $statusNow = 'publier';
+                }else{
+                    $statusNow = 'non publier';
+                };
             }
             $duration = $video->getDuration();
             //methode qui permet de convertir les secondes en h:m:s
-            $video->setDuration($timeConverteur->ConvertisseurTime($duration));
-            $videos = $paginator->paginate(
-                $videos, // Requête contenant les données à paginer (video)
-                $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
-                5 // Nombre de résultats par page
-            );
+            $videoDuration = $video->setDuration($timeConverteur->ConvertisseurTime($duration));
+//            $videos = $paginator->paginate(
+//                $videos, // Requête contenant les données à paginer (video)
+//                $request->query->getInt('page', 1), // Numéro de la page en cours, passé dans l'URL, 1 si aucune page
+//                5 // Nombre de résultats par page
+//            );
 
             return $this->render('studio/show_studio.html.twig',
                 [
                     'videos'=> $videos,
-                    'studio' => $studio
+                    'studio' => $studio,
+                    'status'=>$statusNow
                 ]);
 
         }
-
         return $this->render('studio/show_studio.html.twig',
             [
-                'studio' => $studio
+                'videos'=> $videos,
+                'studio' => $studio,
             ]);
     }
 
