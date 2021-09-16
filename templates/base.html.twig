@@ -2,18 +2,24 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {# Run `composer require symfony/webpack-encore-bundle`
-           and uncomment the following Encore helpers to start using Symfony UX #}
+        <title>{% block title %}Spot On Studio{% endblock %}</title>
         {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
+            <link rel="stylesheet" href="../public/css/style.css">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
         {% endblock %}
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-        <title>spot On Studio</title>
     </head>
-    <body>
+    <header>
+        <ul class="d-flex justify-content-between align-items-center me-2">
+            <li>
+                <div class="w-50" >
+                </div>
+            </li>
+            <li>
+                <span>menu bruger</span>
+            </li>
+        </ul>
+    </header>
+    <body class="body">
         {% for message in app.flashes('success') %}
             <article class="message">
                 <p>{{ message }}</p>
@@ -21,6 +27,9 @@
         {% endfor %}
         {% block body %}
 
+        {% endblock %}
+        {% block javascripts %}
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
         {% endblock %}
     </body>
 </html>

@@ -1,0 +1,63 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.body{
+    background-color: black;
+}
+
+p{
+    color: white;
+}
+
+span{
+   color: white;
+}
+
+li{
+    list-style-type: none;
+}
+
+h2{
+    color: white;
+    font-size: 1.5em;
+}
+.bigImg {
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.bigImage span{
+    font-size: 3em;
+    padding: 17%;
+}
+
+
+.borderTop{
+    height: 10px;
+    width: 100%;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0), #333 50%, #c2c2c2 75%, #ffffff 75%);
+}
+
+.articlesLandingPage {
+    background-size: cover;
+}
+
+.articlesLandingPage span{
+    font-size: 2em;
+    padding: 10%;
+}
+
+
+.imgArticleLandingPage {
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.imgArticleLandingPage span{
+    font-size: 2em;
+}
+
+
+
+

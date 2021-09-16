@@ -1,21 +1,19 @@
 <?php
 
-
 namespace App\Controller;
-
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
-class HomePageController extends AbstractController
+class LandingPage extends AbstractController
+
 {
     /**
-     * @Route ("/home", name="home_page")
+     * @Route("/", name = "landing_page")
      */
-    public function homePage()
+    public function landingPage()
     {
-        return $this->render('index.html.twig');
-
+        return $this->render('landing_page.html.twig');
     }
 
 }
